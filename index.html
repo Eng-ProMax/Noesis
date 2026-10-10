@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="white">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>لغة الإشارة بالصور</title>
+<style>
+:root[data-theme="white"]{--bg:#ffffff;--card:#f4f6fa;--text:#1b2433;--accent:#3b6cf6;--border:#dfe4ee;--ok:#22a06b;--bad:#e5484d}
+:root[data-theme="beige"]{--bg:#f3ead9;--card:#fbf5e8;--text:#4a3b28;--accent:#b5793a;--border:#e0d2b6;--ok:#4f8a4b;--bad:#c4503a}
+:root[data-theme="black"]{--bg:#0f1115;--card:#1a1d24;--text:#eef1f6;--accent:#f0b429;--border:#2b303b;--ok:#3ecf8e;--bad:#ff6b6b}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:"Segoe UI",Tahoma,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;transition:.3s}
+header{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--bg);z-index:5}
+.logo{font-size:26px}
+.themes{display:flex;gap:8px}
+.themes button{width:30px;height:30px;border-radius:50%;border:2px solid var(--border);cursor:pointer}
+.themes button.active{border-color:var(--accent);transform:scale(1.15)}
+.t-white{background:#fff}.t-beige{background:#e8d7b5}.t-black{background:#111}
+nav{display:flex;gap:10px;padding:14px 18px;justify-content:center}
+nav button{flex:1;max-width:200px;padding:12px;font-size:28px;border-radius:16px;border:1px solid var(--border);background:var(--card);color:var(--text);cursor:pointer;transition:.2s}
+nav button.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+main{max-width:980px;margin:0 auto;padding:10px 18px 60px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:14px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:16px 10px;text-align:center;cursor:pointer;transition:.2s;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-height:140px}
+.card:hover{transform:translateY(-4px);border-color:var(--accent);box-shadow:0 8px 20px rgba(0,0,0,.12)}
+.pic{display:flex;align-items:center;justify-content:center;width:90px;height:90px}
+.pic img{max-width:100%;max-height:100%;object-fit:contain;border-radius:12px}
+.emo{font-size:64px;line-height:1}
+.big .pic{width:min(70vw,300px);height:min(70vw,300px)}
+.big .emo{font-size:150px}
+.label{font-size:15px;font-weight:600}
+.back{margin:10px 0 16px;padding:10px 18px;border-radius:12px;border:1px solid var(--border);background:var(--card);color:var(--text);cursor:pointer;font-size:16px}
+.title{font-size:22px;margin:8px 0 14px;text-align:center}
+/* modal */
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:20;padding:16px}
+.modal.show{display:flex}
+.sheet{background:var(--bg);border-radius:24px;padding:22px;max-width:620px;width:100%;max-height:92vh;overflow:auto;text-align:center;position:relative}
+.close{position:absolute;top:10px;left:14px;font-size:26px;background:none;border:none;color:var(--text);cursor:pointer}
+.sheet h2{font-size:30px;margin-bottom:6px}
+.spell{display:flex;flex-wrap:wrap-reverse;gap:8px;justify-content:center;margin-top:16px;direction:rtl}
+.spell .l{width:68px;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:6px;display:flex;flex-direction:column;align-items:center;gap:4px}
+.spell .l .pic{width:54px;height:54px}
+.spell .l .emo{font-size:36px}
+.spell .l b{font-size:20px;color:var(--accent)}
+/* quiz */
+.qword{font-size:38px;font-weight:700;text-align:center;margin:10px 0 18px}
+.opts{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.opt{background:var(--card);border:3px solid var(--border);border-radius:20px;padding:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;aspect-ratio:1;transition:.2s}
+.opt .pic{width:100%;height:100%}
+.opt .emo{font-size:clamp(44px,13vw,90px)}
+.opt.ok{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 20%,var(--card))}
+.opt.bad{border-color:var(--bad);animation:shake .4s}
+@keyframes shake{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+.score{text-align:center;font-size:20px;margin-bottom:6px}
+/* search */
+.bar{display:flex;gap:8px;margin-bottom:14px}
+.bar input{flex:1;padding:14px;font-size:18px;border-radius:14px;border:1px solid var(--border);background:var(--card);color:var(--text);outline:none}
+.bar input:focus{border-color:var(--accent)}
+.modes{display:flex;gap:8px;justify-content:center;margin-bottom:14px}
+.modes button{padding:10px 16px;border-radius:12px;border:1px solid var(--border);background:var(--card);color:var(--text);cursor:pointer;font-size:15px}
+.modes button.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.empty{text-align:center;padding:40px;font-size:50px;opacity:.5}
+canvas#confetti{position:fixed;inset:0;pointer-events:none;z-index:50}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">🤟</div>
+  <div class="themes">
+    <button class="t-white" data-t="white" title="أبيض"></button>
+    <button class="t-beige" data-t="beige" title="بيج"></button>
+    <button class="t-black" data-t="black" title="أسود"></button>
+  </div>
+</header>
+
+<nav>
+  <button data-tab="cats" class="active">📚</button>
+  <button data-tab="quiz">🎯</button>
+  <button data-tab="search">🔍</button>
+</nav>
+
+<main id="view"></main>
+
+<div class="modal" id="modal"><div class="sheet" id="sheet"></div></div>
+<canvas id="confetti"></canvas>
+
+<script>
+/* ============ البيانات (من Supabase) ============ */
+const SUPABASE_URL = "ضع_رابط_مشروعك_هنا";
+const SUPABASE_KEY = "ضع_anon_key_هنا";
+let CATS = [], ALL = [];
+
+async function loadData(){
+  const h = {apikey:SUPABASE_KEY, Authorization:"Bearer "+SUPABASE_KEY};
+  const [c,i] = await Promise.all([
+    fetch(`${SUPABASE_URL}/rest/v1/categories?select=*&order=sort`,{headers:h}).then(r=>r.json()),
+    fetch(`${SUPABASE_URL}/rest/v1/items?select=*`,{headers:h}).then(r=>r.json())
+  ]);
+  CATS = c.map(x=>({
+    id:x.id, name:x.name, emoji:x.emoji,
+    items:i.filter(y=>y.category_id===x.id).map(y=>({
+      id:y.id, name:y.name, emoji:y.emoji, cat:x.id, img:y.image_url, sign:y.sign_url
+    }))
+  }));
+  ALL = CATS.flatMap(c=>c.items);
+}
+
+const LETTERS = ["ا","ب","ت","ث","ج","ح","خ","د","ذ","ر","ز","س","ش","ص","ض","ط","ظ","ع","غ","ف","ق","ك","ل","م","ن","ه","و","ي"];
+const NORMAL = {"أ":"ا","إ":"ا","آ":"ا","ة":"ه","ى":"ي","ئ":"ي","ؤ":"و"};
+
+/* ============ أدوات ============ */
+const $ = s => document.querySelector(s);
+const view = $("#view");
+function fb(img,txt){const s=document.createElement("span");s.className="emo";s.textContent=txt;img.replaceWith(s)}
+window.fb = fb;
+const pic = (it,kind="obj") => {
+  const src = kind==="sign" ? (it.sign || `signs/${it.cat}/${it.id}.png`) : (it.img || `images/${it.cat}/${it.id}.png`);
+  const alt = kind==="sign" ? "🤟" : it.emoji;
+  return `<span class="pic"><img src="${src}" alt="" onerror="fb(this,'${alt}')"></span>`;
+};
+const letterPic = ch => {
+  const n = LETTERS.indexOf(ch)+1;
+  return `<div class="l"><span class="pic"><img src="signs/letters/${n}.png" alt="" onerror="fb(this,'🤟')"></span><b>${ch}</b></div>`;
+};
+const shuffle = a => a.map(v=>[Math.random(),v]).sort((x,y)=>x[0]-y[0]).map(x=>x[1]);
+
+/* ============ الثيمات ============ */
+function setTheme(t){
+  document.documentElement.dataset.theme=t;
+  document.querySelectorAll(".themes button").forEach(b=>b.classList.toggle("active",b.dataset.t===t));
+  try{localStorage.setItem("theme",t)}catch(e){}
+}
+document.querySelectorAll(".themes button").forEach(b=>b.onclick=()=>setTheme(b.dataset.t));
+let saved="white"; try{saved=localStorage.getItem("theme")||"white"}catch(e){}
+setTheme(saved);
+
+/* ============ التبويبات ============ */
+document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll("nav button").forEach(x=>x.classList.toggle("active",x===b));
+  ({cats:showCats,quiz:showQuizCats,search:showSearch})[b.dataset.tab]();
+});
+
+/* ============ 1) الفئات ============ */
+function showCats(){
+  view.innerHTML = `<div class="grid">${CATS.map(c=>`
+    <div class="card" data-c="${c.id}"><span class="emo">${c.emoji}</span></div>`).join("")}</div>`;
+  view.querySelectorAll("[data-c]").forEach(el=>el.onclick=()=>showItems(el.dataset.c));
+}
+function showItems(cid){
+  const c = CATS.find(x=>x.id===cid);
+  view.innerHTML = `<button class="back">➡️</button>
+    <div class="grid">${c.items.map(it=>`<div class="card" data-i="${it.id}">${pic(it)}</div>`).join("")}</div>`;
+  view.querySelector(".back").onclick=showCats;
+  view.querySelectorAll("[data-i]").forEach(el=>el.onclick=()=>openSign(c.items.find(i=>i.id===el.dataset.i)));
+}
+function openSign(it){
+  const chars=[...it.name].filter(ch=>ch!==" ").map(ch=>NORMAL[ch]||ch).filter(ch=>LETTERS.includes(ch));
+  $("#sheet").innerHTML = `<button class="close">✖</button>
+    <div class="big">${pic(it,"sign")}</div>
+    <div class="spell">${chars.map(letterPic).join("")}</div>`;
+  $("#modal").classList.add("show");
+  $(".close").onclick=closeModal;
+}
+function closeModal(){$("#modal").classList.remove("show")}
+$("#modal").onclick=e=>{if(e.target.id==="modal")closeModal()};
+
+/* ============ 2) الاختبار ============ */
+let score=0, locked=false;
+function showQuizCats(){
+  view.innerHTML = `<div class="title">🎯</div><div class="grid">${CATS.map(c=>`
+    <div class="card" data-c="${c.id}"><span class="emo">${c.emoji}</span></div>`).join("")}</div>`;
+  view.querySelectorAll("[data-c]").forEach(el=>el.onclick=()=>{score=0;nextQ(el.dataset.c)});
+}
+function nextQ(cid){
+  locked=false;
+  const c=CATS.find(x=>x.id===cid);
+  const right=c.items[Math.floor(Math.random()*c.items.length)];
+  const opts=shuffle([right,...shuffle(c.items.filter(i=>i!==right)).slice(0,2)]);
+  view.innerHTML = `<button class="back">➡️</button>
+    <div class="score">⭐ ${score}</div>
+    <div class="qword">${right.name}</div>
+    <div class="opts">${opts.map(o=>`<div class="opt" data-i="${o.id}">${pic(o)}</div>`).join("")}</div>`;
+  view.querySelector(".back").onclick=showQuizCats;
+  view.querySelectorAll(".opt").forEach(el=>el.onclick=()=>{
+    if(locked)return;
+    if(el.dataset.i===right.id){
+      locked=true; el.classList.add("ok"); score++; confetti();
+      setTimeout(()=>nextQ(cid),2200);
+    }else{
+      el.classList.add("bad"); setTimeout(()=>el.classList.remove("bad"),450);
+    }
+  });
+}
+
+/* ============ 3) البحث ============ */
+let mode="word";
+function showSearch(){
+  view.innerHTML = `<div class="modes">
+      <button data-m="word" class="${mode==="word"?"active":""}">كلمة ➜ 🖼️</button>
+      <button data-m="img" class="${mode==="img"?"active":""}">🖼️ ➜ كلمة</button></div>
+    <div id="sbox"></div>`;
+  view.querySelectorAll("[data-m]").forEach(b=>b.onclick=()=>{mode=b.dataset.m;showSearch()});
+  mode==="word" ? searchWord() : searchImg();
+}
+function searchWord(){
+  $("#sbox").innerHTML = `<div class="bar"><input id="q" placeholder="🔍" autocomplete="off"></div><div id="res"></div>`;
+  const q=$("#q"), res=$("#res");
+  const run=()=>{
+    const v=q.value.trim();
+    if(!v){res.innerHTML=`<div class="empty">🔍</div>`;return}
+    const f=ALL.filter(i=>i.name.includes(v));
+    res.innerHTML = f.length ? `<div class="grid">${f.map(it=>`<div class="card" data-i="${it.id}" data-c="${it.cat}">${pic(it)}</div>`).join("")}</div>` : `<div class="empty">🤷</div>`;
+    res.querySelectorAll(".card").forEach(el=>el.onclick=()=>openSign(ALL.find(i=>i.id===el.dataset.i&&i.cat===el.dataset.c)));
+  };
+  q.oninput=run; run(); q.focus();
+}
+function searchImg(){
+  $("#sbox").innerHTML = `<div class="grid">${ALL.map(it=>`<div class="card" data-i="${it.id}" data-c="${it.cat}">${pic(it)}</div>`).join("")}</div>`;
+  $("#sbox").querySelectorAll(".card").forEach(el=>el.onclick=()=>{
+    const it=ALL.find(i=>i.id===el.dataset.i&&i.cat===el.dataset.c);
+    $("#sheet").innerHTML = `<button class="close">✖</button><div class="big">${pic(it)}</div><h2>${it.name}</h2>`;
+    $("#modal").classList.add("show"); $(".close").onclick=closeModal;
+  });
+}
+
+/* ============ القصاصات 🎉 ============ */
+const cv=$("#confetti"), cx=cv.getContext("2d");
+function confetti(){
+  cv.width=innerWidth; cv.height=innerHeight;
+  const cols=["#ff595e","#ffca3a","#8ac926","#1982c4","#6a4c93","#ff924c"];
+  const ps=Array.from({length:220},()=>({
+    x:Math.random()*cv.width, y:-20-Math.random()*cv.height*.5,
+    w:6+Math.random()*8, h:10+Math.random()*10,
+    c:cols[Math.floor(Math.random()*cols.length)],
+    vy:2+Math.random()*4, vx:-2+Math.random()*4,
+    r:Math.random()*6, vr:-.2+Math.random()*.4}));
+  const t0=performance.now();
+  (function f(t){
+    cx.clearRect(0,0,cv.width,cv.height);
+    ps.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.r+=p.vr;
+      cx.save();cx.translate(p.x,p.y);cx.rotate(p.r);cx.fillStyle=p.c;cx.fillRect(-p.w/2,-p.h/2,p.w,p.h);cx.restore()});
+    if(t-t0<3200) requestAnimationFrame(f); else cx.clearRect(0,0,cv.width,cv.height);
+  })(t0);
+}
+
+loadData().then(showCats);
+</script>
+</body>
+</html>
