@@ -155,10 +155,8 @@ function showItems(cid){
   view.querySelectorAll("[data-i]").forEach(el=>el.onclick=()=>openSign(c.items.find(i=>i.id===el.dataset.i)));
 }
 function openSign(it){
-  const chars=[...it.name].filter(ch=>ch!==" ").map(ch=>NORMAL[ch]||ch).filter(ch=>LETTERS.includes(ch));
-  $("#sheet").innerHTML = `<button class="close">✖</button>
-    <div class="big">${pic(it,"sign")}</div>
-    <div class="spell">${chars.map(letterPic).join("")}</div>`;
+  $("#sheet").innerHTML = <button class="close">✖</button>
+    <div class="big">${pic(it,"sign")}</div>;
   $("#modal").classList.add("show");
   $(".close").onclick=closeModal;
 }
