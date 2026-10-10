@@ -155,8 +155,8 @@ function showItems(cid){
   view.querySelectorAll("[data-i]").forEach(el=>el.onclick=()=>openSign(c.items.find(i=>i.id===el.dataset.i)));
 }
 function openSign(it){
-  $("#sheet").innerHTML = <button class="close">✖</button>
-    <div class="big">${pic(it,"sign")}</div>;
+  $("#sheet").innerHTML = `<button class="close">✖</button>
+    <div class="big">${pic(it,"sign")}</div>`;
   $("#modal").classList.add("show");
   $(".close").onclick=closeModal;
 }
