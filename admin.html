@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>إضافة محتوى</title>
+<style>
+:root{--bg:#f3ead9;--card:#fbf5e8;--text:#4a3b28;--accent:#b5793a;--border:#e0d2b6}
+@media (prefers-color-scheme:dark){:root{--bg:#0f1115;--card:#1a1d24;--text:#eef1f6;--accent:#f0b429;--border:#2b303b}}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Segoe UI",Tahoma,sans-serif;background:var(--bg);color:var(--text);height:100vh;display:flex;flex-direction:column;max-width:640px;margin:0 auto}
+h1{font-size:18px;padding:14px 16px;border-bottom:1px solid var(--border);text-align:center}
+#log{flex:1;overflow:auto;padding:16px;display:flex;flex-direction:column;gap:10px}
+.msg{max-width:85%;padding:10px 14px;border-radius:16px;font-size:16px;line-height:1.5;white-space:pre-wrap;word-break:break-word}
+.bot{background:var(--card);border:1px solid var(--border);align-self:flex-start;border-bottom-right-radius:4px}
+.me{background:var(--accent);color:#fff;align-self:flex-end;border-bottom-left-radius:4px}
+.msg img{max-width:220px;max-height:220px;border-radius:12px;display:block}
+#ctl{padding:12px;border-top:1px solid var(--border);display:flex;flex-wrap:wrap;gap:8px;background:var(--bg)}
+#ctl button{padding:12px 16px;border-radius:12px;border:1px solid var(--accent);background:var(--accent);color:#fff;font-size:15px;cursor:pointer}
+#ctl button.alt{background:var(--card);color:var(--text);border-color:var(--border)}
+#ctl input[type=text],#ctl input[type=password],#ctl input[type=email]{flex:1;min-width:160px;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--card);color:var(--text);font-size:16px;outline:none}
+#ctl input[type=file]{flex:1;padding:10px;font-size:15px;color:var(--text)}
+</style>
+</head>
+<body>
+<h1>🤟 إضافة محتوى للموقع</h1>
+<div id="log"></div>
+<div id="ctl"></div>
+
+<script>
+const URL_ = "https://mxlaeygympuvsppvjivl.supabase.co";
+const KEY  = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im14bGFleWd5bXB1dnNwcHZqaXZsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE2NTA3NDMsImV4cCI6MjEwNzIyNjc0M30.mfy_J-lPmfl5CBfZ3JSmabxtnkKexunU4GRHxj1W-p0";
+
+let token=null, cats=[], S={};
+const log=document.getElementById("log"), ctl=document.getElementById("ctl");
+
+function add(cls,t){const d=document.createElement("div");d.className="msg "+cls;d.textContent=t;log.appendChild(d);log.scrollTop=log.scrollHeight;return d}
+const bot=t=>add("bot",t), me=t=>add("me",t);
+function err(e){bot("❌ صار خطأ:\n"+(e.message||e));nextMenu()}
+
+function buttons(list){
+  ctl.innerHTML="";
+  list.forEach(([label,fn])=>{const b=document.createElement("button");b.textContent=label;b.onclick=()=>{me(label);fn()};ctl.appendChild(b)});
+}
+function ask(ph,cb,o={}){
+  ctl.innerHTML="";
+  const i=document.createElement("input");i.type=o.type||"text";i.placeholder=ph;
+  const b=document.createElement("button");b.textContent="إرسال";
+  const go=()=>{const v=i.value.trim();if(!v&&!o.skip)return;me(o.type==="password"?"••••••":(v||"—"));cb(v)};
+  b.onclick=go;i.onkeydown=e=>{if(e.key==="Enter")go()};
+  ctl.append(i,b);
+  if(o.skip){const s=document.createElement("button");s.className="alt";s.textContent="تخطي";s.onclick=()=>{me("تخطي");cb("")};ctl.append(s)}
+  i.focus();
+}
+
+const H=()=>({apikey:KEY,Authorization:"Bearer "+(token||KEY),"Content-Type":"application/json"});
+async function db(path,opt={}){
+  const r=await fetch(URL_+"/rest/v1/"+path,{...opt,headers:{...H(),...(opt.headers||{})}});
+  const t=await r.text();
+  if(!r.ok)throw new Error(t);
+  return t?JSON.parse(t):null;
+}
+
+/* ===== تسجيل الدخول ===== */
+function stepLogin(){
+  bot("هلا 👋 سجّل دخول أولاً.\nشنو الإيميل؟");
+  ask("الإيميل",email=>{
+    bot("والباسورد؟");
+    ask("الباسورد",async pw=>{
+      try{
+        const r=await fetch(URL_+"/auth/v1/token?grant_type=password",{method:"POST",headers:{apikey:KEY,"Content-Type":"application/json"},body:JSON.stringify({email,password:pw})});
+        const j=await r.json();
+        if(!r.ok)throw new Error(j.error_description||j.msg||"فشل تسجيل الدخول");
+        token=j.access_token;
+        cats=await db("categories?select=*&order=sort");
+        bot("تم تسجيل الدخول ✅");
+        stepCat();
+      }catch(e){bot("❌ "+e.message);stepLogin()}
+    },{type:"password"});
+  },{type:"email"});
+}
+
+/* ===== الفئة ===== */
+function stepCat(){
+  bot("اختار الفئة:");
+  buttons([...cats.map(c=>[c.emoji+" "+c.name,()=>{S.cat=c;stepName()}]),["➕ فئة جديدة",newCat]]);
+}
+function newCat(){
+  bot("شنو اسم الفئة الجديدة؟");
+  ask("اسم الفئة",name=>{
+    bot("شنو الإيموجي مالها؟");
+    ask("مثال: 🍽️",async emo=>{
+      try{
+        const row={id:"c"+Date.now().toString(36),name,emoji:emo,sort:cats.length+1};
+        await db("categories",{method:"POST",headers:{Prefer:"return=minimal"},body:JSON.stringify(row)});
+        cats.push(row);S.cat=row;
+        bot("انضافت الفئة ✅");
+        stepName();
+      }catch(e){err(e)}
+    });
+  });
+}
+
+/* ===== الكلمة ===== */
+function stepName(){
+  bot("شنو اسم الكلمة؟ (مثال: تفاحة)");
+  ask("الكلمة",async name=>{
+    try{
+      S.name=name;S.emoji="";
+      const ex=await db(`items?select=*&category_id=eq.${S.cat.id}&name=eq.${encodeURIComponent(name)}`);
+      if(ex.length){
+        S.item=ex[0];
+        bot("هذي الكلمة موجودة من قبل، راح أضيف الصورة لها.");
+        stepKind();
+      }else{
+        S.item=null;
+        bot("تريد إيموجي بديل للكلمة؟ (يظهر إذا الصورة ما موجودة)");
+        ask("🍎",emo=>{S.emoji=emo;stepKind()},{skip:true});
+      }
+    }catch(e){err(e)}
+  });
+}
+
+/* ===== نوع الصورة والرفع ===== */
+function stepKind(){
+  bot("شنو نوع الصورة؟");
+  buttons([
+    ["🖼️ صورة الشيء",()=>{S.kind="images";stepFile()}],
+    ["🤟 صورة الإشارة",()=>{S.kind="signs";stepFile()}]
+  ]);
+}
+function stepFile(){
+  bot("اختار الصورة من جهازك 👇");
+  ctl.innerHTML="";
+  const f=document.createElement("input");f.type="file";f.accept="image/*";
+  f.onchange=()=>{if(f.files[0])upload(f.files[0])};
+  ctl.append(f);
+}
+async function upload(file){
+  me("📷 "+file.name);
+  bot("جاري الرفع...");
+  ctl.innerHTML="";
+  try{
+    if(!S.item){
+      const row={id:"i"+Date.now().toString(36),category_id:S.cat.id,name:S.name,emoji:S.emoji||null};
+      await db("items",{method:"POST",headers:{Prefer:"return=minimal"},body:JSON.stringify(row)});
+      S.item=row;
+    }
+    const ext=((file.name.split(".").pop()||"png").toLowerCase().replace(/[^a-z0-9]/g,""))||"png";
+    const path=`${S.kind}/${S.cat.id}/${S.item.id}-${Date.now()}.${ext}`;
+    const r=await fetch(`${URL_}/storage/v1/object/media/${path}`,{
+      method:"POST",
+      headers:{apikey:KEY,Authorization:"Bearer "+token,"Content-Type":file.type||"image/png"},
+      body:file
+    });
+    if(!r.ok)throw new Error(await r.text());
+    const url=`${URL_}/storage/v1/object/public/media/${path}`;
+    const col=S.kind==="images"?"image_url":"sign_url";
+    await db(`items?category_id=eq.${S.cat.id}&id=eq.${S.item.id}`,{method:"PATCH",headers:{Prefer:"return=minimal"},body:JSON.stringify({[col]:url})});
+    const d=bot("تم الرفع وربطها بالكلمة «"+S.name+"» ✅");
+    const im=document.createElement("img");im.src=url;d.appendChild(im);
+    nextMenu();
+  }catch(e){err(e)}
+}
+
+function nextMenu(){
+  bot("شنو تريد هسة؟");
+  buttons([
+    ["➕ صورة ثانية لنفس الكلمة",()=>S.item?stepKind():stepName()],
+    ["📝 كلمة جديدة بنفس الفئة",stepName],
+    ["📂 فئة ثانية",stepCat]
+  ]);
+}
+
+stepLogin();
+</script>
+</body>
+</html>
