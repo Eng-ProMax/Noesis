@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl" data-theme="white">
+<html lang="ar" dir="rtl" data-theme="pink">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -8,6 +8,7 @@
 :root[data-theme="white"]{--bg:#ffffff;--card:#f4f6fa;--text:#1b2433;--accent:#3b6cf6;--border:#dfe4ee;--ok:#22a06b;--bad:#e5484d}
 :root[data-theme="beige"]{--bg:#f3ead9;--card:#fbf5e8;--text:#4a3b28;--accent:#b5793a;--border:#e0d2b6;--ok:#4f8a4b;--bad:#c4503a}
 :root[data-theme="black"]{--bg:#0f1115;--card:#1a1d24;--text:#eef1f6;--accent:#f0b429;--border:#2b303b;--ok:#3ecf8e;--bad:#ff6b6b}
+:root[data-theme="pink"]{--bg:#fff0f5;--card:#ffe4ec;--text:#5a2a3c;--accent:#e0719a;--border:#f5c6d6;--ok:#4f9d78;--bad:#d64561}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 body{font-family:"Segoe UI",Tahoma,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;transition:.3s}
 header{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--bg);z-index:5}
@@ -15,7 +16,7 @@ header{display:flex;justify-content:space-between;align-items:center;padding:14p
 .themes{display:flex;gap:8px}
 .themes button{width:30px;height:30px;border-radius:50%;border:2px solid var(--border);cursor:pointer}
 .themes button.active{border-color:var(--accent);transform:scale(1.15)}
-.t-white{background:#fff}.t-beige{background:#e8d7b5}.t-black{background:#111}
+.t-white{background:#fff}.t-beige{background:#e8d7b5}.t-black{background:#111}.t-pink{background:#fff0f5}
 nav{display:flex;gap:10px;padding:14px 18px;justify-content:center}
 nav button{flex:1;max-width:200px;padding:12px;font-size:28px;border-radius:16px;border:1px solid var(--border);background:var(--card);color:var(--text);cursor:pointer;transition:.2s}
 nav button.active{background:var(--accent);color:#fff;border-color:var(--accent)}
@@ -23,10 +24,17 @@ main{max-width:980px;margin:0 auto;padding:10px 18px 60px}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:14px}
 .card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:16px 10px;text-align:center;cursor:pointer;transition:.2s;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-height:140px}
 .card:hover{transform:translateY(-4px);border-color:var(--accent);box-shadow:0 8px 20px rgba(0,0,0,.12)}
-.pic{display:flex;align-items:center;justify-content:center;width:90px;height:90px}
+.pic{display:flex;align-items:center;justify-content:center;width:var(--pic,90px);height:var(--pic,90px)}
 .pic img{max-width:100%;max-height:100%;object-fit:contain;border-radius:12px}
 .emo{font-size:64px;line-height:1}
+.ic{width:1.1em;height:1.1em;object-fit:contain;vertical-align:middle;display:inline-block}
+.flat .card{background:transparent;border-color:transparent}
+.flat .card:hover{box-shadow:none;background:var(--card)}
+.flat .pic img{border-radius:0}
+.blend .pic img{mix-blend-mode:multiply}
+html[data-theme="black"] .blend .pic img{mix-blend-mode:normal}
 .big .pic{width:min(70vw,300px);height:min(70vw,300px)}
+.big .pic img{mix-blend-mode:normal!important;border-radius:12px}
 .big .emo{font-size:150px}
 .label{font-size:15px;font-weight:600}
 .back{margin:10px 0 16px;padding:10px 18px;border-radius:12px;border:1px solid var(--border);background:var(--card);color:var(--text);cursor:pointer;font-size:16px}
@@ -71,6 +79,7 @@ canvas#confetti{position:fixed;inset:0;pointer-events:none;z-index:50}
     <button class="t-white" data-t="white" title="أبيض"></button>
     <button class="t-beige" data-t="beige" title="بيج"></button>
     <button class="t-black" data-t="black" title="أسود"></button>
+    <button class="t-pink" data-t="pink" title="وردي"></button>
   </div>
 </header>
 
@@ -89,16 +98,18 @@ canvas#confetti{position:fixed;inset:0;pointer-events:none;z-index:50}
 /* ============ البيانات (من Supabase) ============ */
 const SUPABASE_URL = "https://mxlaeygympuvsppvjivl.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im14bGFleWd5bXB1dnNwcHZqaXZsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE2NTA3NDMsImV4cCI6MjEwNzIyNjc0M30.mfy_J-lPmfl5CBfZ3JSmabxtnkKexunU4GRHxj1W-p0";
-let CATS = [], ALL = [];
+let CATS = [], ALL = [], UI = {};
 
 async function loadData(){
   const h = {apikey:SUPABASE_KEY, Authorization:"Bearer "+SUPABASE_KEY};
-  const [c,i] = await Promise.all([
+  const [c,i,s] = await Promise.all([
     fetch(`${SUPABASE_URL}/rest/v1/categories?select=*&order=sort`,{headers:h}).then(r=>r.json()),
-    fetch(`${SUPABASE_URL}/rest/v1/items?select=*`,{headers:h}).then(r=>r.json())
+    fetch(`${SUPABASE_URL}/rest/v1/items?select=*`,{headers:h}).then(r=>r.json()),
+    fetch(`${SUPABASE_URL}/rest/v1/settings?select=value&key=eq.ui`,{headers:h}).then(r=>r.json()).catch(()=>[])
   ]);
+  UI = (Array.isArray(s) && s[0] && s[0].value) || {};
   CATS = c.map(x=>({
-    id:x.id, name:x.name, emoji:x.emoji,
+    id:x.id, name:x.name, emoji:x.emoji, img:x.image_url,
     items:i.filter(y=>y.category_id===x.id).map(y=>({
       id:y.id, name:y.name, emoji:y.emoji, cat:x.id, img:y.image_url, sign:y.sign_url
     }))
@@ -108,6 +119,46 @@ async function loadData(){
 
 const LETTERS = ["ا","ب","ت","ث","ج","ح","خ","د","ذ","ر","ز","س","ش","ص","ض","ط","ظ","ع","غ","ف","ق","ك","ل","م","ن","ه","و","ي"];
 const NORMAL = {"أ":"ا","إ":"ا","آ":"ا","ة":"ه","ى":"ي","ئ":"ي","ؤ":"و"};
+
+/* ============ التصميم (من لوحة الأدمن) ============ */
+const DEF_THEMES = {
+  white:{bg:"#ffffff",card:"#f4f6fa",text:"#1b2433",accent:"#3b6cf6",border:"#dfe4ee"},
+  beige:{bg:"#f3ead9",card:"#fbf5e8",text:"#4a3b28",accent:"#b5793a",border:"#e0d2b6"},
+  black:{bg:"#0f1115",card:"#1a1d24",text:"#eef1f6",accent:"#f0b429",border:"#2b303b"},
+  pink:{bg:"#fff0f5",card:"#ffe4ec",text:"#5a2a3c",accent:"#e0719a",border:"#f5c6d6"}
+};
+const DEF_STYLE = {flat:true, blend:true, size:100};
+const okHex = v => /^#[0-9a-f]{6}$/i.test(v||"");
+const esc = s => String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function mergedTheme(n){
+  const o=(UI.themes||{})[n]||{}, d=DEF_THEMES[n], r={};
+  Object.keys(d).forEach(k=>r[k]=okHex(o[k])?o[k]:d[k]);
+  return r;
+}
+const ico = (k,def) => {
+  const v=(UI.icons||{})[k];
+  if(v&&v.url) return `<img class="ic" src="${esc(v.url)}" alt="">`;
+  return esc((v&&v.emoji)||def);
+};
+function applyUI(){
+  let css="";
+  Object.keys(DEF_THEMES).forEach(n=>{
+    const m=mergedTheme(n);
+    css+=`:root[data-theme="${n}"]{--bg:${m.bg};--card:${m.card};--text:${m.text};--accent:${m.accent};--border:${m.border}}`;
+  });
+  let el=document.getElementById("dyn");
+  if(!el){el=document.createElement("style");el.id="dyn";document.head.appendChild(el)}
+  el.textContent=css;
+  document.querySelectorAll(".themes button").forEach(b=>{b.style.background=mergedTheme(b.dataset.t).bg});
+  document.querySelector(".logo").innerHTML=ico("logo","🤟");
+  document.querySelector('nav [data-tab="cats"]').innerHTML=ico("cats","📚");
+  document.querySelector('nav [data-tab="quiz"]').innerHTML=ico("quiz","🎯");
+  document.querySelector('nav [data-tab="search"]').innerHTML=ico("search","🔍");
+  const s={...DEF_STYLE,...(UI.style||{})};
+  document.body.classList.toggle("flat",!!s.flat);
+  document.body.classList.toggle("blend",!!s.blend);
+  document.documentElement.style.setProperty("--pic",(Number(s.size)||100)+"px");
+}
 
 /* ============ أدوات ============ */
 const $ = s => document.querySelector(s);
@@ -124,6 +175,7 @@ const letterPic = ch => {
   return `<div class="l"><span class="pic"><img src="signs/letters/${n}.png" alt="" onerror="fb(this,'🤟')"></span><b>${ch}</b></div>`;
 };
 const shuffle = a => a.map(v=>[Math.random(),v]).sort((x,y)=>x[0]-y[0]).map(x=>x[1]);
+const catPic = c => c.img ? `<span class="pic"><img src="${c.img}" alt="" onerror="fb(this,'${c.emoji}')"></span>` : `<span class="emo">${c.emoji}</span>`;
 
 /* ============ الثيمات ============ */
 function setTheme(t){
@@ -132,7 +184,7 @@ function setTheme(t){
   try{localStorage.setItem("theme",t)}catch(e){}
 }
 document.querySelectorAll(".themes button").forEach(b=>b.onclick=()=>setTheme(b.dataset.t));
-let saved="white"; try{saved=localStorage.getItem("theme")||"white"}catch(e){}
+let saved="pink"; try{saved=localStorage.getItem("theme")||"pink"}catch(e){}
 setTheme(saved);
 
 /* ============ التبويبات ============ */
@@ -144,12 +196,12 @@ document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{
 /* ============ 1) الفئات ============ */
 function showCats(){
   view.innerHTML = `<div class="grid">${CATS.map(c=>`
-    <div class="card" data-c="${c.id}"><span class="emo">${c.emoji}</span></div>`).join("")}</div>`;
+    <div class="card" data-c="${c.id}">${catPic(c)}</div>`).join("")}</div>`;
   view.querySelectorAll("[data-c]").forEach(el=>el.onclick=()=>showItems(el.dataset.c));
 }
 function showItems(cid){
   const c = CATS.find(x=>x.id===cid);
-  view.innerHTML = `<button class="back">➡️</button>
+  view.innerHTML = `<button class="back">${ico("back","➡️")}</button>
     <div class="grid">${c.items.map(it=>`<div class="card" data-i="${it.id}">${pic(it)}</div>`).join("")}</div>`;
   view.querySelector(".back").onclick=showCats;
   view.querySelectorAll("[data-i]").forEach(el=>el.onclick=()=>openSign(c.items.find(i=>i.id===el.dataset.i)));
@@ -166,8 +218,8 @@ $("#modal").onclick=e=>{if(e.target.id==="modal")closeModal()};
 /* ============ 2) الاختبار ============ */
 let score=0, locked=false;
 function showQuizCats(){
-  view.innerHTML = `<div class="title">🎯</div><div class="grid">${CATS.map(c=>`
-    <div class="card" data-c="${c.id}"><span class="emo">${c.emoji}</span></div>`).join("")}</div>`;
+  view.innerHTML = `<div class="title">${ico("quiz","🎯")}</div><div class="grid">${CATS.map(c=>`
+    <div class="card" data-c="${c.id}">${catPic(c)}</div>`).join("")}</div>`;
   view.querySelectorAll("[data-c]").forEach(el=>el.onclick=()=>{score=0;nextQ(el.dataset.c)});
 }
 function nextQ(cid){
@@ -175,7 +227,7 @@ function nextQ(cid){
   const c=CATS.find(x=>x.id===cid);
   const right=c.items[Math.floor(Math.random()*c.items.length)];
   const opts=shuffle([right,...shuffle(c.items.filter(i=>i!==right)).slice(0,2)]);
-  view.innerHTML = `<button class="back">➡️</button>
+  view.innerHTML = `<button class="back">${ico("back","➡️")}</button>
     <div class="score">⭐ ${score}</div>
     <div class="qword">${right.name}</div>
     <div class="opts">${opts.map(o=>`<div class="opt" data-i="${o.id}">${pic(o)}</div>`).join("")}</div>`;
@@ -242,7 +294,7 @@ function confetti(){
   })(t0);
 }
 
-loadData().then(showCats);
+loadData().then(()=>{applyUI();showCats()});
 </script>
 </body>
 </html>
