@@ -14,12 +14,12 @@ h1{font-size:18px;padding:14px 16px;border-bottom:1px solid var(--border);text-a
 .msg{max-width:85%;padding:10px 14px;border-radius:16px;font-size:16px;line-height:1.5;white-space:pre-wrap;word-break:break-word}
 .bot{background:var(--card);border:1px solid var(--border);align-self:flex-start;border-bottom-right-radius:4px}
 .me{background:var(--accent);color:#fff;align-self:flex-end;border-bottom-left-radius:4px}
-.msg img{max-width:220px;max-height:220px;border-radius:12px;display:block}
+.msg img{max-width:220px;max-height:220px;border-radius:12px;display:block;margin-top:6px}
 #ctl{padding:12px;border-top:1px solid var(--border);display:flex;flex-wrap:wrap;gap:8px;background:var(--bg);max-height:45vh;overflow:auto}
 #ctl button{padding:12px 16px;border-radius:12px;border:1px solid var(--accent);background:var(--accent);color:#fff;font-size:15px;cursor:pointer}
 #ctl button.alt{background:var(--card);color:var(--text);border-color:var(--border)}
 #ctl button.danger{background:var(--danger);border-color:var(--danger)}
-#ctl input[type=text],#ctl input[type=password],#ctl input[type=email]{flex:1;min-width:160px;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--card);color:var(--text);font-size:16px;outline:none}
+#ctl input[type=text],#ctl input[type=password],#ctl input[type=email],#ctl textarea{flex:1;min-width:160px;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--card);color:var(--text);font-size:16px;outline:none;font-family:inherit}
 #ctl input[type=file]{flex:1;padding:10px;font-size:15px;color:var(--text)}
 #ctl input[type=color]{width:70px;height:48px;padding:2px;border-radius:12px;border:1px solid var(--border);background:var(--card);cursor:pointer}
 </style>
@@ -33,7 +33,7 @@ h1{font-size:18px;padding:14px 16px;border-bottom:1px solid var(--border);text-a
 const URL_ = "https://mxlaeygympuvsppvjivl.supabase.co";
 const KEY  = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im14bGFleWd5bXB1dnNwcHZqaXZsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE2NTA3NDMsImV4cCI6MjEwNzIyNjc0M30.mfy_J-lPmfl5CBfZ3JSmabxtnkKexunU4GRHxj1W-p0";
 
-let token=null, cats=[], S={}, UI={};
+let token=null, S={}, UI={};
 const log=document.getElementById("log"), ctl=document.getElementById("ctl");
 
 const DEF_THEMES={
@@ -44,9 +44,18 @@ const DEF_THEMES={
 };
 const THEME_NAMES={white:"⚪ أبيض",beige:"🟤 بيج",black:"⚫ أسود",pink:"🌸 وردي"};
 const COLOR_NAMES={bg:"الخلفية",card:"البطاقات",text:"النص",accent:"اللون الأساسي",border:"الحدود"};
-const ICON_DEF={logo:["🤟","الشعار"],cats:["📚","تبويب الفئات"],quiz:["🎯","تبويب الاختبار"],search:["🔍","تبويب البحث"],back:["➡️","زر الرجوع"]};
+const ICON_DEF={logo:["🤟","الشعار"],win:["🪟","تبويب النوافذ"],voice:["🎙️","تبويب الصوت"]};
 const DEF_STYLE={flat:true,blend:true,size:100};
 const curStyle=()=>({...DEF_STYLE,...(UI.style||{})});
+
+/* أنواع المحتوى: النوافذ والعبارات الصوتية */
+const KINDS={
+  win:{table:"windows",folder:"windows",name:"نافذة",plural:"النوافذ",icon:"🪟",
+    fields:[["title","الاسم","اكتب اسم النافذة (مثال: نافذة 3)"],["text","النص","اكتب النص اللي يظهر للأصم عند الضغط على النافذة"]],
+    multi:{text:true}},
+  phr:{table:"phrases",folder:"phrases",name:"عبارة",plural:"العبارات الصوتية",icon:"🎙️",
+    fields:[["title","الاسم","اكتب اسم العبارة (مثال: الحمام)"],["keywords","كلمات التعرف","اكتب الكلمات اللي ينطقها الموظف وافصل بينها بفاصلة (مثال: حمام, تواليت, حمامات)"]]}
+};
 
 function add(cls,t){const d=document.createElement("div");d.className="msg "+cls;d.textContent=t;log.appendChild(d);log.scrollTop=log.scrollHeight;return d}
 const bot=t=>add("bot",t), me=t=>add("me",t);
@@ -59,10 +68,13 @@ function buttons(list){
 }
 function ask(ph,cb,o={}){
   ctl.innerHTML="";
-  const i=document.createElement("input");i.type=o.type||"text";i.placeholder=ph;
+  const i=document.createElement(o.multi?"textarea":"input");
+  if(o.multi)i.rows=4;else i.type=o.type||"text";
+  i.placeholder=ph;
   const b=document.createElement("button");b.textContent="إرسال";
   const go=()=>{const v=i.value.trim();if(!v&&!o.skip)return;me(o.type==="password"?"••••••":(v||"—"));cb(v)};
-  b.onclick=go;i.onkeydown=e=>{if(e.key==="Enter")go()};
+  b.onclick=go;
+  if(!o.multi)i.onkeydown=e=>{if(e.key==="Enter")go()};
   ctl.append(i,b);
   if(o.skip){const s=document.createElement("button");s.className="alt";s.textContent="تخطي";s.onclick=()=>{me("تخطي");cb("")};ctl.append(s)}
   i.focus();
@@ -147,12 +159,12 @@ function prepImage(file,cb){
 /* ===== الإعدادات ===== */
 async function loadUI(){
   try{const r=await db("settings?select=value&key=eq.ui");UI=(r&&r[0]&&r[0].value)||{}}
-  catch(e){UI={};bot("⚠️ جدول الإعدادات غير موجود. شغّل SQL الجديد أولاً.")}
+  catch(e){UI={};bot("⚠️ جدول الإعدادات غير موجود. شغّل SQL أولاً.")}
 }
 async function saveUI(back){
   try{
     await db("settings",{method:"POST",headers:{Prefer:"resolution=merge-duplicates,return=minimal"},body:JSON.stringify({key:"ui",value:UI})});
-    bot("تم الحفظ ✅ افتح الموقع وسوّي Ctrl+F5.");
+    bot("تم الحفظ ✅ افتح الموقع وحدّث الصفحة.");
     return true;
   }catch(e){errTo(e,back||stepDesign);return false}
 }
@@ -168,7 +180,6 @@ function stepLogin(){
         const j=await r.json();
         if(!r.ok)throw new Error(j.error_description||j.msg||"فشل تسجيل الدخول");
         token=j.access_token;
-        cats=await db("categories?select=*&order=sort");
         await loadUI();
         bot("تم تسجيل الدخول ✅");
         stepMenu();
@@ -181,13 +192,116 @@ function stepLogin(){
 function stepMenu(){
   bot("شنو تريد تسوي؟");
   buttons([
-    ["📝 إضافة كلمة / صورة",stepCat],
-    ["🗂️ إضافة صورة لفئة",catImgPick],
-    ["➕ فئة جديدة",newCat],
-    ["🎨 تصميم الموقع",stepDesign],
-    ["🗑️ حذف كلمة",delItemCat],
-    ["🗑️ حذف فئة",delCatPick,"danger"]
+    ["🪟 النوافذ",()=>kindMenu("win")],
+    ["🎙️ العبارات الصوتية",()=>kindMenu("phr")],
+    ["🎨 تصميم الموقع",stepDesign]
   ]);
+}
+
+/* ===== النوافذ والعبارات (إضافة / تعديل / حذف) ===== */
+function kindMenu(k){
+  const K=KINDS[k];
+  bot(K.icon+" "+K.plural+": شنو تريد؟");
+  buttons([
+    ["➕ إضافة "+K.name,()=>addKind(k)],
+    ["✏️ تعديل / حذف",()=>listKind(k)],
+    ["🏠 رجوع",stepMenu,"alt"]
+  ]);
+}
+function addKind(k){
+  const K=KINDS[k], data={};
+  const next=i=>{
+    if(i>=K.fields.length)return askEmoji();
+    const [f,,hint]=K.fields[i];
+    bot(hint);
+    ask("اكتب هنا",v=>{data[f]=v||null;next(i+1)},{multi:!!(K.multi&&K.multi[f]),skip:i>0});
+  };
+  const askEmoji=()=>{
+    bot("تريد إيموجي بديل؟ (يظهر إذا ما أكو صورة)");
+    ask("مثال: "+K.icon,e=>save(e),{skip:true});
+  };
+  const save=async emo=>{
+    try{
+      const rows=await db(`${K.table}?select=sort&order=sort.desc&limit=1`);
+      const sort=((rows&&rows[0]&&rows[0].sort)||0)+1;
+      const row={id:k+Date.now().toString(36),...data,emoji:emo||null,sort};
+      await db(K.table,{method:"POST",headers:{Prefer:"return=minimal"},body:JSON.stringify(row)});
+      S.k=k;S.row=row;
+      bot("تمت الإضافة ✅\nتريد تضيف صورة؟");
+      buttons([["🖼️ إي، أضيف صورة",imgFile],["🏠 لا، القائمة",stepMenu,"alt"]]);
+    }catch(e){err(e)}
+  };
+  next(0);
+}
+async function listKind(k){
+  const K=KINDS[k];
+  try{
+    const rows=await db(`${K.table}?select=*&order=sort`);
+    if(!rows.length){bot("ما أكو شي بعد.");return kindMenu(k)}
+    bot("اختار:");
+    buttons([...rows.map(r=>[(r.emoji||K.icon)+" "+r.title,()=>rowMenu(k,r)]),["🔙 رجوع",()=>kindMenu(k),"alt"]]);
+  }catch(e){errTo(e,()=>kindMenu(k))}
+}
+function rowMenu(k,row){
+  const K=KINDS[k];
+  const lines=K.fields.map(([f,l])=>"• "+l+": "+(row[f]||"—")).join("\n");
+  const d=bot(lines+"\n• الصورة: "+(row.image_url?"موجودة":"ماكو")+"\nشنو تريد تعدّل؟");
+  if(row.image_url){const im=document.createElement("img");im.src=row.image_url;d.appendChild(im)}
+  buttons([
+    ...K.fields.map(([f,l,hint])=>["✏️ "+l,()=>editField(k,row,f,hint)]),
+    ["🖼️ "+(row.image_url?"تغيير الصورة":"إضافة صورة"),()=>{S.k=k;S.row=row;imgFile()}],
+    ["😀 الإيموجي",()=>editField(k,row,"emoji","اكتب الإيموجي البديل")],
+    ["🗑️ حذف",()=>confirmDel(K.name+" «"+row.title+"»",()=>doDel(k,row)),"danger"],
+    ["🔙 رجوع",()=>listKind(k),"alt"]
+  ]);
+}
+function editField(k,row,f,hint){
+  const K=KINDS[k];
+  bot(hint+(row[f]?"\nالحالي: "+row[f]:""));
+  ask("اكتب هنا",async v=>{
+    try{
+      const val=v||null;
+      await db(`${K.table}?id=eq.${row.id}`,{method:"PATCH",headers:{Prefer:"return=minimal"},body:JSON.stringify({[f]:val})});
+      row[f]=val;
+      bot("انحفظ ✅");
+      rowMenu(k,row);
+    }catch(e){errTo(e,()=>rowMenu(k,row))}
+  },{multi:!!(K.multi&&K.multi[f]),skip:f!=="title"});
+}
+function imgFile(){
+  bot("اختار الصورة من جهازك 👇");
+  ctl.innerHTML="";
+  const f=document.createElement("input");f.type="file";f.accept="image/*";
+  f.onchange=()=>{const file=f.files[0];if(!file)return;me("📷 "+file.name);prepImage(file,uploadImg)};
+  ctl.append(f);
+}
+async function uploadImg(file){
+  const K=KINDS[S.k], row=S.row;
+  bot("جاري الرفع...");
+  ctl.innerHTML="";
+  try{
+    const old=row.image_url;
+    const url=await uploadFile(`${K.folder}/${row.id}-${Date.now()}.${extOf(file)}`,file);
+    await db(`${K.table}?id=eq.${row.id}`,{method:"PATCH",headers:{Prefer:"return=minimal"},body:JSON.stringify({image_url:url})});
+    row.image_url=url;
+    await removeFileByUrl(old);
+    bot("تم حفظ الصورة ✅");
+    rowMenu(S.k,row);
+  }catch(e){err(e)}
+}
+function confirmDel(what,fn){
+  bot("متأكد تريد تحذف "+what+"؟ ما يمكن التراجع ⚠️");
+  buttons([["🗑️ إي، احذف",fn,"danger"],["❌ إلغاء",()=>{bot("تم الإلغاء.");stepMenu()},"alt"]]);
+}
+async function doDel(k,row){
+  const K=KINDS[k];
+  try{
+    const r=await db(`${K.table}?id=eq.${row.id}`,{method:"DELETE",headers:{Prefer:"return=representation"}});
+    if(!r||!r.length)throw new Error("ما انحذفت. تأكد إنك شغّلت SQL الصلاحيات.");
+    await removeFileByUrl(row.image_url);
+    bot("انحذفت ✅");
+    kindMenu(k);
+  }catch(e){errTo(e,()=>kindMenu(k))}
 }
 
 /* ===== تصميم الموقع ===== */
@@ -200,8 +314,6 @@ function stepDesign(){
     ["🏠 القائمة",stepMenu,"alt"]
   ]);
 }
-
-/* الألوان */
 function colorTheme(){
   bot("أي ثيم تريد تعدّل ألوانه؟");
   buttons([...Object.keys(DEF_THEMES).map(t=>[THEME_NAMES[t],()=>colorKey(t)]),["🔙 رجوع",stepDesign,"alt"]]);
@@ -227,8 +339,6 @@ async function resetTheme(t){
   if(UI.themes)delete UI.themes[t];
   if(await saveUI(()=>colorKey(t)))colorKey(t);
 }
-
-/* الأيقونات */
 const iconNow=k=>{const v=(UI.icons||{})[k];return v&&v.url?"🖼️":(v&&v.emoji)||ICON_DEF[k][0]};
 function iconPick(){
   bot("أي أيقونة تريد تغيّر؟");
@@ -269,8 +379,6 @@ function iconFile(k){
   };
   ctl.append(f);
 }
-
-/* شكل البطاقات */
 function styleMenu(){
   const s=curStyle();
   bot("الإعدادات الحالية:\n• البطاقات: "+(s.flat?"بدون إطار":"بإطار")+"\n• دمج الصور مع الخلفية: "+(s.blend?"شغّال":"طافي")+"\n• حجم الصور: "+s.size);
@@ -288,169 +396,6 @@ async function setStyle(p){
 function sizePick(){
   bot("اختار حجم الصور بالبطاقات:");
   buttons([["صغير",()=>setStyle({size:80})],["متوسط",()=>setStyle({size:100})],["كبير",()=>setStyle({size:130})],["ضخم",()=>setStyle({size:160})],["🔙 رجوع",styleMenu,"alt"]]);
-}
-
-/* ===== الفئة ===== */
-function stepCat(){
-  bot("اختار الفئة:");
-  buttons([...cats.map(c=>[(c.emoji||"")+" "+c.name,()=>{S.cat=c;stepName()}]),["➕ فئة جديدة",newCat],["🏠 رجوع",stepMenu,"alt"]]);
-}
-function newCat(){
-  bot("شنو اسم الفئة الجديدة؟");
-  ask("اسم الفئة",name=>{
-    bot("شنو الإيموجي مالها؟");
-    ask("مثال: 🍽️",async emo=>{
-      try{
-        const row={id:"c"+Date.now().toString(36),name,emoji:emo,sort:cats.length+1};
-        await db("categories",{method:"POST",headers:{Prefer:"return=minimal"},body:JSON.stringify(row)});
-        cats.push(row);S.cat=row;
-        bot("انضافت الفئة ✅\nتريد تضيف صورة لها؟");
-        buttons([
-          ["🖼️ إي، أضيف صورة",catImgFile],
-          ["📝 لا، أضيف كلمة",stepName],
-          ["🏠 القائمة",stepMenu,"alt"]
-        ]);
-      }catch(e){err(e)}
-    });
-  });
-}
-
-/* ===== صورة للفئة ===== */
-function catImgPick(){
-  bot("لأي فئة تريد تضيف صورة؟");
-  buttons([...cats.map(c=>[(c.emoji||"")+" "+c.name,()=>{S.cat=c;catImgFile()}]),["🏠 رجوع",stepMenu,"alt"]]);
-}
-function catImgFile(){
-  bot("اختار صورة الفئة «"+S.cat.name+"» من جهازك 👇");
-  ctl.innerHTML="";
-  const f=document.createElement("input");f.type="file";f.accept="image/*";
-  f.onchange=()=>{const file=f.files[0];if(!file)return;me("📷 "+file.name);prepImage(file,uploadCatImg)};
-  ctl.append(f);
-}
-async function uploadCatImg(file){
-  bot("جاري الرفع...");
-  ctl.innerHTML="";
-  try{
-    const old=S.cat.image_url;
-    const url=await uploadFile(`categories/${S.cat.id}-${Date.now()}.${extOf(file)}`,file);
-    await db(`categories?id=eq.${S.cat.id}`,{method:"PATCH",headers:{Prefer:"return=minimal"},body:JSON.stringify({image_url:url})});
-    S.cat.image_url=url;
-    await removeFileByUrl(old);
-    const d=bot("تم حفظ صورة الفئة «"+S.cat.name+"» ✅");
-    const im=document.createElement("img");im.src=url;d.appendChild(im);
-    stepMenu();
-  }catch(e){err(e)}
-}
-
-/* ===== الكلمة ===== */
-function stepName(){
-  bot("شنو اسم الكلمة؟ (مثال: تفاحة)");
-  ask("الكلمة",async name=>{
-    try{
-      S.name=name;S.emoji="";
-      const ex=await db(`items?select=*&category_id=eq.${S.cat.id}&name=eq.${encodeURIComponent(name)}`);
-      if(ex.length){
-        S.item=ex[0];
-        bot("هذي الكلمة موجودة من قبل، راح أضيف الصورة لها.");
-        stepKind();
-      }else{
-        S.item=null;
-        bot("تريد إيموجي بديل للكلمة؟ (يظهر إذا الصورة ما موجودة)");
-        ask("🍎",emo=>{S.emoji=emo;stepKind()},{skip:true});
-      }
-    }catch(e){err(e)}
-  });
-}
-
-/* ===== نوع الصورة والرفع ===== */
-function stepKind(){
-  bot("شنو نوع الصورة؟");
-  buttons([
-    ["🖼️ صورة الشيء",()=>{S.kind="images";stepFile()}],
-    ["🤟 صورة الإشارة",()=>{S.kind="signs";stepFile()}]
-  ]);
-}
-function stepFile(){
-  bot("اختار الصورة من جهازك 👇");
-  ctl.innerHTML="";
-  const f=document.createElement("input");f.type="file";f.accept="image/*";
-  f.onchange=()=>{
-    const file=f.files[0];if(!file)return;
-    me("📷 "+file.name);
-    if(S.kind==="images")prepImage(file,upload);else upload(file);
-  };
-  ctl.append(f);
-}
-async function upload(file){
-  bot("جاري الرفع...");
-  ctl.innerHTML="";
-  try{
-    if(!S.item){
-      const row={id:"i"+Date.now().toString(36),category_id:S.cat.id,name:S.name,emoji:S.emoji||null};
-      await db("items",{method:"POST",headers:{Prefer:"return=minimal"},body:JSON.stringify(row)});
-      S.item=row;
-    }
-    const url=await uploadFile(`${S.kind}/${S.cat.id}/${S.item.id}-${Date.now()}.${extOf(file)}`,file);
-    const col=S.kind==="images"?"image_url":"sign_url";
-    await db(`items?category_id=eq.${S.cat.id}&id=eq.${S.item.id}`,{method:"PATCH",headers:{Prefer:"return=minimal"},body:JSON.stringify({[col]:url})});
-    const d=bot("تم الرفع وربطها بالكلمة «"+S.name+"» ✅");
-    const im=document.createElement("img");im.src=url;d.appendChild(im);
-    nextMenu();
-  }catch(e){err(e)}
-}
-
-function nextMenu(){
-  bot("شنو تريد هسة؟");
-  buttons([
-    ["➕ صورة ثانية لنفس الكلمة",()=>S.item?stepKind():stepName()],
-    ["📝 كلمة جديدة بنفس الفئة",stepName],
-    ["📂 فئة ثانية",stepCat],
-    ["🏠 القائمة الرئيسية",stepMenu,"alt"]
-  ]);
-}
-
-/* ===== الحذف ===== */
-function confirmDel(what,fn){
-  bot("متأكد تريد تحذف "+what+"؟ ما يمكن التراجع ⚠️");
-  buttons([["🗑️ إي، احذف",fn,"danger"],["❌ إلغاء",()=>{bot("تم الإلغاء.");stepMenu()},"alt"]]);
-}
-function delItemCat(){
-  bot("من أي فئة تريد تحذف كلمة؟");
-  buttons([...cats.map(c=>[(c.emoji||"")+" "+c.name,()=>delItemList(c)]),["🏠 رجوع",stepMenu,"alt"]]);
-}
-async function delItemList(c){
-  try{
-    const its=await db(`items?select=*&category_id=eq.${c.id}&order=name`);
-    if(!its.length){bot("هذي الفئة فارغة.");return stepMenu()}
-    bot("اختار الكلمة اللي تريد تحذفها:");
-    buttons([...its.map(i=>[(i.emoji||"")+" "+i.name,()=>confirmDel("الكلمة «"+i.name+"»",()=>doDelItem(i))]),["🏠 رجوع",stepMenu,"alt"]]);
-  }catch(e){err(e)}
-}
-async function doDelItem(i){
-  try{
-    const r=await db(`items?category_id=eq.${i.category_id}&id=eq.${i.id}`,{method:"DELETE",headers:{Prefer:"return=representation"}});
-    if(!r||!r.length)throw new Error("ما انحذفت. تأكد إنك شغّلت SQL صلاحيات الحذف.");
-    await removeFileByUrl(i.image_url);
-    await removeFileByUrl(i.sign_url);
-    bot("انحذفت الكلمة «"+i.name+"» ✅");
-    stepMenu();
-  }catch(e){err(e)}
-}
-function delCatPick(){
-  bot("اختار الفئة اللي تريد تحذفها:\n(تنحذف معها كل كلماتها)");
-  buttons([...cats.map(c=>[(c.emoji||"")+" "+c.name,()=>confirmDel("الفئة «"+c.name+"» مع كل كلماتها",()=>doDelCat(c))]),["🏠 رجوع",stepMenu,"alt"]]);
-}
-async function doDelCat(c){
-  try{
-    const its=await db(`items?select=*&category_id=eq.${c.id}`);
-    const r=await db(`categories?id=eq.${c.id}`,{method:"DELETE",headers:{Prefer:"return=representation"}});
-    if(!r||!r.length)throw new Error("ما انحذفت. تأكد إنك شغّلت SQL صلاحيات الحذف.");
-    for(const i of its){await removeFileByUrl(i.image_url);await removeFileByUrl(i.sign_url)}
-    await removeFileByUrl(c.image_url);
-    cats=cats.filter(x=>x.id!==c.id);
-    bot("انحذفت الفئة «"+c.name+"» وكلماتها ✅");
-    stepMenu();
-  }catch(e){err(e)}
 }
 
 stepLogin();
