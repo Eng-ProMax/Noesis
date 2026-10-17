@@ -3,22 +3,31 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>لغة الإشارة بالصور</title>
+<title>مساعد الصم والبكم</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<meta name="theme-color" content="#e0719a">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="مساعد الصم">
 <style>
-:root[data-theme="white"]{--bg:#ffffff;--card:#f4f6fa;--text:#1b2433;--accent:#3b6cf6;--border:#dfe4ee;--ok:#22a06b;--bad:#e5484d}
-:root[data-theme="beige"]{--bg:#f3ead9;--card:#fbf5e8;--text:#4a3b28;--accent:#b5793a;--border:#e0d2b6;--ok:#4f8a4b;--bad:#c4503a}
-:root[data-theme="black"]{--bg:#0f1115;--card:#1a1d24;--text:#eef1f6;--accent:#f0b429;--border:#2b303b;--ok:#3ecf8e;--bad:#ff6b6b}
-:root[data-theme="pink"]{--bg:#fff0f5;--card:#ffe4ec;--text:#5a2a3c;--accent:#e0719a;--border:#f5c6d6;--ok:#4f9d78;--bad:#d64561}
+:root[data-theme="white"]{--bg:#ffffff;--card:#f4f6fa;--text:#1b2433;--accent:#3b6cf6;--border:#dfe4ee;--bad:#e5484d}
+:root[data-theme="beige"]{--bg:#f3ead9;--card:#fbf5e8;--text:#4a3b28;--accent:#b5793a;--border:#e0d2b6;--bad:#c4503a}
+:root[data-theme="black"]{--bg:#0f1115;--card:#1a1d24;--text:#eef1f6;--accent:#f0b429;--border:#2b303b;--bad:#ff6b6b}
+:root[data-theme="pink"]{--bg:#fff0f5;--card:#ffe4ec;--text:#5a2a3c;--accent:#e0719a;--border:#f5c6d6;--bad:#d64561}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 body{font-family:"Segoe UI",Tahoma,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;transition:.3s}
 header{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--bg);z-index:5}
+.hl{display:flex;align-items:center;gap:10px}
 .logo{font-size:26px}
+.offi{font-size:16px}
+.inst{display:none;padding:4px 10px;border-radius:12px;border:1px solid var(--border);background:var(--card);color:var(--text);cursor:pointer;font-size:18px}
 .themes{display:flex;gap:8px}
 .themes button{width:30px;height:30px;border-radius:50%;border:2px solid var(--border);cursor:pointer}
 .themes button.active{border-color:var(--accent);transform:scale(1.15)}
 .t-white{background:#fff}.t-beige{background:#e8d7b5}.t-black{background:#111}.t-pink{background:#fff0f5}
 nav{display:flex;gap:10px;padding:14px 18px;justify-content:center}
-nav button{flex:1;max-width:200px;padding:12px;font-size:28px;border-radius:16px;border:1px solid var(--border);background:var(--card);color:var(--text);cursor:pointer;transition:.2s}
+nav button{flex:1;max-width:260px;padding:12px;font-size:30px;border-radius:16px;border:1px solid var(--border);background:var(--card);color:var(--text);cursor:pointer;transition:.2s}
 nav button.active{background:var(--accent);color:#fff;border-color:var(--accent)}
 main{max-width:980px;margin:0 auto;padding:10px 18px 60px}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:14px}
@@ -28,6 +37,7 @@ main{max-width:980px;margin:0 auto;padding:10px 18px 60px}
 .pic img{max-width:100%;max-height:100%;object-fit:contain;border-radius:12px}
 .emo{font-size:64px;line-height:1}
 .ic{width:1.1em;height:1.1em;object-fit:contain;vertical-align:middle;display:inline-block}
+.label{font-size:16px;font-weight:600}
 .flat .card{background:transparent;border-color:transparent}
 .flat .card:hover{box-shadow:none;background:var(--card)}
 .flat .pic img{border-radius:0}
@@ -36,45 +46,39 @@ html[data-theme="black"] .blend .pic img{mix-blend-mode:normal}
 .big .pic{width:min(70vw,300px);height:min(70vw,300px)}
 .big .pic img{mix-blend-mode:normal!important;border-radius:12px}
 .big .emo{font-size:150px}
-.label{font-size:15px;font-weight:600}
-.back{margin:10px 0 16px;padding:10px 18px;border-radius:12px;border:1px solid var(--border);background:var(--card);color:var(--text);cursor:pointer;font-size:16px}
-.title{font-size:22px;margin:8px 0 14px;text-align:center}
+.empty{text-align:center;padding:40px;font-size:50px;opacity:.5}
 /* modal */
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:20;padding:16px}
 .modal.show{display:flex}
 .sheet{background:var(--bg);border-radius:24px;padding:22px;max-width:620px;width:100%;max-height:92vh;overflow:auto;text-align:center;position:relative}
 .close{position:absolute;top:10px;left:14px;font-size:26px;background:none;border:none;color:var(--text);cursor:pointer}
-.sheet h2{font-size:30px;margin-bottom:6px}
-.spell{display:flex;flex-wrap:wrap-reverse;gap:8px;justify-content:center;margin-top:16px;direction:rtl}
-.spell .l{width:68px;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:6px;display:flex;flex-direction:column;align-items:center;gap:4px}
-.spell .l .pic{width:54px;height:54px}
-.spell .l .emo{font-size:36px}
-.spell .l b{font-size:20px;color:var(--accent)}
-/* quiz */
-.qword{font-size:38px;font-weight:700;text-align:center;margin:10px 0 18px}
-.opts{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-.opt{background:var(--card);border:3px solid var(--border);border-radius:20px;padding:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;aspect-ratio:1;transition:.2s}
-.opt .pic{width:100%;height:100%}
-.opt .emo{font-size:clamp(44px,13vw,90px)}
-.opt.ok{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 20%,var(--card))}
-.opt.bad{border-color:var(--bad);animation:shake .4s}
-@keyframes shake{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
-.score{text-align:center;font-size:20px;margin-bottom:6px}
-/* search */
-.bar{display:flex;gap:8px;margin-bottom:14px}
-.bar input{flex:1;padding:14px;font-size:18px;border-radius:14px;border:1px solid var(--border);background:var(--card);color:var(--text);outline:none}
-.bar input:focus{border-color:var(--accent)}
-.modes{display:flex;gap:8px;justify-content:center;margin-bottom:14px}
-.modes button{padding:10px 16px;border-radius:12px;border:1px solid var(--border);background:var(--card);color:var(--text);cursor:pointer;font-size:15px}
-.modes button.active{background:var(--accent);color:#fff;border-color:var(--accent)}
-.empty{text-align:center;padding:40px;font-size:50px;opacity:.5}
-canvas#confetti{position:fixed;inset:0;pointer-events:none;z-index:50}
+.sheet h2{font-size:30px;margin:6px 0}
+.txt{font-size:26px;line-height:1.7;white-space:pre-wrap;margin-top:8px}
+/* voice */
+.micwrap{display:flex;flex-direction:column;align-items:center;gap:10px;margin:6px 0 18px}
+.mic{width:110px;height:110px;border-radius:50%;border:4px solid var(--accent);background:var(--card);font-size:48px;cursor:pointer;transition:.2s}
+.mic.rec{background:var(--bad);border-color:var(--bad);animation:pulse 1s infinite}
+@keyframes pulse{50%{transform:scale(1.08)}}
+.vstat{font-size:15px;text-align:center;opacity:.9;min-height:20px}
+.vmsg{font-size:15px;text-align:center;min-height:20px;font-weight:600}
+.offb{display:inline-block;padding:10px 16px;border-radius:12px;border:1px solid var(--border);background:var(--card);color:var(--text);cursor:pointer;font-size:15px}
+.heard{text-align:center;font-size:18px;opacity:.8;margin:8px 0}
+.vcards{display:flex;flex-wrap:wrap;gap:16px;justify-content:center;margin:10px 0 24px}
+.vcard{background:var(--card);border:2px solid var(--accent);border-radius:24px;padding:18px;display:flex;flex-direction:column;align-items:center;gap:10px;min-width:min(80vw,260px)}
+.vcard .pic{width:min(55vw,220px);height:min(55vw,220px)}
+.vcard .emo{font-size:130px}
+.vl{font-size:28px;font-weight:700}
+.sep{border:none;border-top:1px solid var(--border);margin:8px 0 18px}
 </style>
 </head>
 <body>
 
 <header>
-  <div class="logo">🤟</div>
+  <div class="hl">
+    <div class="logo">🤟</div>
+    <span class="offi" id="offi"></span>
+    <button class="inst" id="inst" title="تثبيت">📲</button>
+  </div>
   <div class="themes">
     <button class="t-white" data-t="white" title="أبيض"></button>
     <button class="t-beige" data-t="beige" title="بيج"></button>
@@ -84,41 +88,34 @@ canvas#confetti{position:fixed;inset:0;pointer-events:none;z-index:50}
 </header>
 
 <nav>
-  <button data-tab="cats" class="active">📚</button>
-  <button data-tab="quiz">🎯</button>
-  <button data-tab="search">🔍</button>
+  <button data-tab="win" class="active">🪟</button>
+  <button data-tab="voice">🎙️</button>
 </nav>
 
 <main id="view"></main>
 
 <div class="modal" id="modal"><div class="sheet" id="sheet"></div></div>
-<canvas id="confetti"></canvas>
 
 <script>
 /* ============ البيانات (من Supabase) ============ */
 const SUPABASE_URL = "https://mxlaeygympuvsppvjivl.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im14bGFleWd5bXB1dnNwcHZqaXZsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE2NTA3NDMsImV4cCI6MjEwNzIyNjc0M30.mfy_J-lPmfl5CBfZ3JSmabxtnkKexunU4GRHxj1W-p0";
-let CATS = [], ALL = [], UI = {};
+const API = p => SUPABASE_URL + "/rest/v1/" + p;
+const Q = {
+  win:"windows?select=*&order=sort",
+  phr:"phrases?select=*&order=sort",
+  ui:"settings?select=value&key=eq.ui"
+};
+let WINS = [], PHRASES = [], UI = {};
 
 async function loadData(){
   const h = {apikey:SUPABASE_KEY, Authorization:"Bearer "+SUPABASE_KEY};
-  const [c,i,s] = await Promise.all([
-    fetch(`${SUPABASE_URL}/rest/v1/categories?select=*&order=sort`,{headers:h}).then(r=>r.json()),
-    fetch(`${SUPABASE_URL}/rest/v1/items?select=*`,{headers:h}).then(r=>r.json()),
-    fetch(`${SUPABASE_URL}/rest/v1/settings?select=value&key=eq.ui`,{headers:h}).then(r=>r.json()).catch(()=>[])
-  ]);
+  const get = p => fetch(API(p),{headers:h}).then(r=>{if(!r.ok)throw new Error("http");return r.json()});
+  const [w,p,s] = await Promise.all([get(Q.win), get(Q.phr), get(Q.ui).catch(()=>[])]);
   UI = (Array.isArray(s) && s[0] && s[0].value) || {};
-  CATS = c.map(x=>({
-    id:x.id, name:x.name, emoji:x.emoji, img:x.image_url,
-    items:i.filter(y=>y.category_id===x.id).map(y=>({
-      id:y.id, name:y.name, emoji:y.emoji, cat:x.id, img:y.image_url, sign:y.sign_url
-    }))
-  }));
-  ALL = CATS.flatMap(c=>c.items);
+  WINS = w.map(x=>({id:x.id,title:x.title,text:x.text,emoji:x.emoji,img:x.image_url}));
+  PHRASES = p.map(x=>({id:x.id,title:x.title,keywords:x.keywords,emoji:x.emoji,img:x.image_url}));
 }
-
-const LETTERS = ["ا","ب","ت","ث","ج","ح","خ","د","ذ","ر","ز","س","ش","ص","ض","ط","ظ","ع","غ","ف","ق","ك","ل","م","ن","ه","و","ي"];
-const NORMAL = {"أ":"ا","إ":"ا","آ":"ا","ة":"ه","ى":"ي","ئ":"ي","ؤ":"و"};
 
 /* ============ التصميم (من لوحة الأدمن) ============ */
 const DEF_THEMES = {
@@ -129,7 +126,7 @@ const DEF_THEMES = {
 };
 const DEF_STYLE = {flat:true, blend:true, size:100};
 const okHex = v => /^#[0-9a-f]{6}$/i.test(v||"");
-const esc = s => String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const esc = s => String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 function mergedTheme(n){
   const o=(UI.themes||{})[n]||{}, d=DEF_THEMES[n], r={};
   Object.keys(d).forEach(k=>r[k]=okHex(o[k])?o[k]:d[k]);
@@ -151,9 +148,8 @@ function applyUI(){
   el.textContent=css;
   document.querySelectorAll(".themes button").forEach(b=>{b.style.background=mergedTheme(b.dataset.t).bg});
   document.querySelector(".logo").innerHTML=ico("logo","🤟");
-  document.querySelector('nav [data-tab="cats"]').innerHTML=ico("cats","📚");
-  document.querySelector('nav [data-tab="quiz"]').innerHTML=ico("quiz","🎯");
-  document.querySelector('nav [data-tab="search"]').innerHTML=ico("search","🔍");
+  document.querySelector('nav [data-tab="win"]').innerHTML=ico("win","🪟");
+  document.querySelector('nav [data-tab="voice"]').innerHTML=ico("voice","🎙️");
   const s={...DEF_STYLE,...(UI.style||{})};
   document.body.classList.toggle("flat",!!s.flat);
   document.body.classList.toggle("blend",!!s.blend);
@@ -165,17 +161,13 @@ const $ = s => document.querySelector(s);
 const view = $("#view");
 function fb(img,txt){const s=document.createElement("span");s.className="emo";s.textContent=txt;img.replaceWith(s)}
 window.fb = fb;
-const pic = (it,kind="obj") => {
-  const src = kind==="sign" ? (it.sign || `signs/${it.cat}/${it.id}.png`) : (it.img || `images/${it.cat}/${it.id}.png`);
-  const alt = kind==="sign" ? "🤟" : it.emoji;
-  return `<span class="pic"><img src="${src}" alt="" onerror="fb(this,'${alt}')"></span>`;
+const pic = o => {
+  const e = esc(o.emoji||"🖼️");
+  return o.img
+    ? `<span class="pic"><img src="${esc(o.img)}" alt="" onerror="fb(this,'${e}')"></span>`
+    : `<span class="emo">${e}</span>`;
 };
-const letterPic = ch => {
-  const n = LETTERS.indexOf(ch)+1;
-  return `<div class="l"><span class="pic"><img src="signs/letters/${n}.png" alt="" onerror="fb(this,'🤟')"></span><b>${ch}</b></div>`;
-};
-const shuffle = a => a.map(v=>[Math.random(),v]).sort((x,y)=>x[0]-y[0]).map(x=>x[1]);
-const catPic = c => c.img ? `<span class="pic"><img src="${c.img}" alt="" onerror="fb(this,'${c.emoji}')"></span>` : `<span class="emo">${c.emoji}</span>`;
+const nrm = s => String(s==null?"":s).replace(/[\u064B-\u065F\u0670\u0640]/g,"").replace(/[أإآ]/g,"ا").replace(/ى/g,"ي").replace(/ة/g,"ه").replace(/[^\u0600-\u06FFa-zA-Z0-9\s]/g," ").replace(/\s+/g," ").trim();
 
 /* ============ الثيمات ============ */
 function setTheme(t){
@@ -190,111 +182,176 @@ setTheme(saved);
 /* ============ التبويبات ============ */
 document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{
   document.querySelectorAll("nav button").forEach(x=>x.classList.toggle("active",x===b));
-  ({cats:showCats,quiz:showQuizCats,search:showSearch})[b.dataset.tab]();
+  if(voiceRec){try{voiceRec.abort()}catch(e){}}
+  ({win:showWins,voice:showVoice})[b.dataset.tab]();
 });
 
-/* ============ 1) الفئات ============ */
-function showCats(){
-  view.innerHTML = `<div class="grid">${CATS.map(c=>`
-    <div class="card" data-c="${c.id}">${catPic(c)}</div>`).join("")}</div>`;
-  view.querySelectorAll("[data-c]").forEach(el=>el.onclick=()=>showItems(el.dataset.c));
+/* ============ 1) النوافذ ============ */
+function showWins(){
+  view.innerHTML = WINS.length
+    ? `<div class="grid">${WINS.map(w=>`<div class="card" data-w="${esc(w.id)}">${pic(w)}</div>`).join("")}</div>`
+    : `<div class="empty">🪟</div>`;
+  view.querySelectorAll("[data-w]").forEach(el=>el.onclick=()=>openWin(WINS.find(w=>w.id===el.dataset.w)));
 }
-function showItems(cid){
-  const c = CATS.find(x=>x.id===cid);
-  view.innerHTML = `<button class="back">${ico("back","➡️")}</button>
-    <div class="grid">${c.items.map(it=>`<div class="card" data-i="${it.id}">${pic(it)}</div>`).join("")}</div>`;
-  view.querySelector(".back").onclick=showCats;
-  view.querySelectorAll("[data-i]").forEach(el=>el.onclick=()=>openSign(c.items.find(i=>i.id===el.dataset.i)));
-}
-function openSign(it){
+function openWin(w){
   $("#sheet").innerHTML = `<button class="close">✖</button>
-    <div class="big">${pic(it,"sign")}</div>`;
+    <div class="big">${pic(w)}</div>
+    <h2>${esc(w.title)}</h2>${w.text?`<p class="txt">${esc(w.text)}</p>`:""}`;
   $("#modal").classList.add("show");
   $(".close").onclick=closeModal;
 }
 function closeModal(){$("#modal").classList.remove("show")}
 $("#modal").onclick=e=>{if(e.target.id==="modal")closeModal()};
 
-/* ============ 2) الاختبار ============ */
-let score=0, locked=false;
-function showQuizCats(){
-  view.innerHTML = `<div class="title">${ico("quiz","🎯")}</div><div class="grid">${CATS.map(c=>`
-    <div class="card" data-c="${c.id}">${catPic(c)}</div>`).join("")}</div>`;
-  view.querySelectorAll("[data-c]").forEach(el=>el.onclick=()=>{score=0;nextQ(el.dataset.c)});
-}
-function nextQ(cid){
-  locked=false;
-  const c=CATS.find(x=>x.id===cid);
-  const right=c.items[Math.floor(Math.random()*c.items.length)];
-  const opts=shuffle([right,...shuffle(c.items.filter(i=>i!==right)).slice(0,2)]);
-  view.innerHTML = `<button class="back">${ico("back","➡️")}</button>
-    <div class="score">⭐ ${score}</div>
-    <div class="qword">${right.name}</div>
-    <div class="opts">${opts.map(o=>`<div class="opt" data-i="${o.id}">${pic(o)}</div>`).join("")}</div>`;
-  view.querySelector(".back").onclick=showQuizCats;
-  view.querySelectorAll(".opt").forEach(el=>el.onclick=()=>{
-    if(locked)return;
-    if(el.dataset.i===right.id){
-      locked=true; el.classList.add("ok"); score++; confetti();
-      setTimeout(()=>nextQ(cid),2200);
-    }else{
-      el.classList.add("bad"); setTimeout(()=>el.classList.remove("bad"),450);
+/* ============ 2) الصوت ============ */
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+const LANGS = ["ar-IQ","ar-SA","ar-EG","ar"];
+let voiceInfo = null, voiceRec = null;
+
+async function probeVoice(){
+  if(!SR) return {kind:"none"};
+  if(typeof SR.available==="function"){
+    let dl=null;
+    for(const l of LANGS){
+      try{
+        const s=await SR.available({langs:[l],processLocally:true});
+        if(s==="available") return {kind:"local",lang:l};
+        if(!dl&&(s==="downloadable"||s==="downloading")) dl=l;
+      }catch(e){}
     }
+    if(dl) return {kind:"download",lang:dl};
+  }
+  return {kind:"cloud",lang:"ar-IQ"};
+}
+function matchPhrases(text){
+  const t=" "+nrm(text)+" ", hits=[];
+  PHRASES.forEach(p=>{
+    const kws=[p.title,...String(p.keywords||"").split(/[,،\n]/)].map(k=>nrm(k).replace(/^ال/,"")).filter(Boolean);
+    let best=-1;
+    kws.forEach(k=>{
+      const i = k.length<3 ? t.indexOf(" "+k+" ") : t.indexOf(k);
+      if(i>=0&&(best<0||i<best)) best=i;
+    });
+    if(best>=0) hits.push([best,p]);
   });
+  return hits.sort((a,b)=>a[0]-b[0]).map(h=>h[1]);
 }
-
-/* ============ 3) البحث ============ */
-let mode="word";
-function showSearch(){
-  view.innerHTML = `<div class="modes">
-      <button data-m="word" class="${mode==="word"?"active":""}">كلمة ➜ 🖼️</button>
-      <button data-m="img" class="${mode==="img"?"active":""}">🖼️ ➜ كلمة</button></div>
-    <div id="sbox"></div>`;
-  view.querySelectorAll("[data-m]").forEach(b=>b.onclick=()=>{mode=b.dataset.m;showSearch()});
-  mode==="word" ? searchWord() : searchImg();
+function showResult(list,heard){
+  const el=$("#vres"); if(!el) return;
+  const h = heard ? `<div class="heard">«${esc(heard)}»</div>` : "";
+  el.innerHTML = list.length
+    ? h+`<div class="vcards">${list.map(p=>`<div class="vcard">${pic(p)}<div class="vl">${esc(p.title)}</div></div>`).join("")}</div>`
+    : h+`<div class="empty">🤷</div>`;
 }
-function searchWord(){
-  $("#sbox").innerHTML = `<div class="bar"><input id="q" placeholder="🔍" autocomplete="off"></div><div id="res"></div>`;
-  const q=$("#q"), res=$("#res");
-  const run=()=>{
-    const v=q.value.trim();
-    if(!v){res.innerHTML=`<div class="empty">🔍</div>`;return}
-    const f=ALL.filter(i=>i.name.includes(v));
-    res.innerHTML = f.length ? `<div class="grid">${f.map(it=>`<div class="card" data-i="${it.id}" data-c="${it.cat}">${pic(it)}</div>`).join("")}</div>` : `<div class="empty">🤷</div>`;
-    res.querySelectorAll(".card").forEach(el=>el.onclick=()=>openSign(ALL.find(i=>i.id===el.dataset.i&&i.cat===el.dataset.c)));
+function vmsg(t){const m=$("#vmsg"); if(m) m.textContent=t||""}
+function renderVStatus(){
+  const st=$("#vst"); if(!st) return;
+  let t="";
+  if(!SR) t="❌ هذا المتصفح ما يدعم التعرف الصوتي. استخدم الصور بالأسفل.";
+  else if(!voiceInfo) t="⏳ ...";
+  else if(voiceInfo.kind==="local") t="🟢 الصوت يعمل بدون نت";
+  else if(voiceInfo.kind==="download") t="🟡 تحتاج تنزيل الصوت العربي مرة وحدة (يحتاج نت)";
+  else t=navigator.onLine ? "🟡 الصوت يعمل مع النت فقط على هذا الجهاز" : "📴 لا يوجد نت: استخدم الصور بالأسفل";
+  st.textContent=t;
+  if(SR&&voiceInfo&&voiceInfo.kind==="download"){
+    const b=document.createElement("button");
+    b.className="offb"; b.textContent="⬇️ تنزيل الصوت العربي";
+    b.onclick=async()=>{
+      try{
+        st.textContent="⏳ جاري التنزيل...";
+        await SR.install({langs:[voiceInfo.lang],processLocally:true});
+        voiceInfo=await probeVoice();
+      }catch(e){st.textContent="❌ تعذّر التنزيل. تأكد من النت وجرب مرة ثانية.";return}
+      renderVStatus();
+    };
+    st.appendChild(document.createElement("br"));
+    st.appendChild(b);
+  }
+}
+function toggleMic(){
+  if(!SR||!voiceInfo) return;
+  if(voiceRec){voiceRec.stop();return}
+  if(voiceInfo.kind==="download"){vmsg("نزّل الصوت العربي أولاً ⬇️");return}
+  if(voiceInfo.kind==="cloud"&&!navigator.onLine){vmsg("📴 بدون نت الصوت ما يشتغل هنا، استخدم الصور.");return}
+  const rec=new SR();
+  rec.lang=voiceInfo.lang; rec.continuous=false; rec.interimResults=false; rec.maxAlternatives=3;
+  if(voiceInfo.kind==="local") rec.processLocally=true;
+  rec.onresult=ev=>{
+    const alts=[];
+    for(let i=0;i<ev.results.length;i++) for(let j=0;j<ev.results[i].length;j++) alts.push(ev.results[i][j].transcript);
+    showResult(matchPhrases(alts.join(" ")),alts[0]||"");
+    vmsg("");
   };
-  q.oninput=run; run(); q.focus();
+  rec.onerror=ev=>{
+    const m={
+      "not-allowed":"🎙️ اسمح للمتصفح باستخدام المايك",
+      "service-not-allowed":"🎙️ اسمح للمتصفح باستخدام المايك",
+      "no-speech":"ما سمعت شي، جرب مرة ثانية",
+      "network":"📴 الصوت يحتاج نت على هذا الجهاز",
+      "language-not-supported":"اللغة العربية غير مدعومة هنا"
+    };
+    vmsg(m[ev.error]||("❌ "+ev.error));
+  };
+  rec.onend=()=>{voiceRec=null;const mic=$("#mic");if(mic)mic.classList.remove("rec")};
+  try{
+    vmsg("");
+    voiceRec=rec; rec.start();
+    $("#mic").classList.add("rec");
+  }catch(e){voiceRec=null;$("#mic").classList.remove("rec");vmsg("❌ تعذّر تشغيل المايك")}
 }
-function searchImg(){
-  $("#sbox").innerHTML = `<div class="grid">${ALL.map(it=>`<div class="card" data-i="${it.id}" data-c="${it.cat}">${pic(it)}</div>`).join("")}</div>`;
-  $("#sbox").querySelectorAll(".card").forEach(el=>el.onclick=()=>{
-    const it=ALL.find(i=>i.id===el.dataset.i&&i.cat===el.dataset.c);
-    $("#sheet").innerHTML = `<button class="close">✖</button><div class="big">${pic(it)}</div><h2>${it.name}</h2>`;
-    $("#modal").classList.add("show"); $(".close").onclick=closeModal;
+function showVoice(){
+  view.innerHTML = `<div class="micwrap">
+      <button class="mic" id="mic">🎙️</button>
+      <div class="vstat" id="vst"></div>
+      <div class="vmsg" id="vmsg"></div>
+    </div>
+    <div id="vres"></div>
+    <hr class="sep">
+    <div class="grid">${PHRASES.map(p=>`<div class="card" data-p="${esc(p.id)}">${pic(p)}<div class="label">${esc(p.title)}</div></div>`).join("")}</div>`;
+  $("#mic").onclick=toggleMic;
+  view.querySelectorAll("[data-p]").forEach(el=>el.onclick=()=>{
+    showResult([PHRASES.find(p=>p.id===el.dataset.p)],"");
+    const r=$("#vres"); if(r) r.scrollIntoView({behavior:"smooth",block:"start"});
+  });
+  renderVStatus();
+  if(!voiceInfo) probeVoice().then(v=>{voiceInfo=v;renderVStatus()});
+}
+
+/* ============ تثبيت التطبيق + العمل بدون نت ============ */
+let deferredInstall=null;
+addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferredInstall=e;$("#inst").style.display="inline-block"});
+addEventListener("appinstalled",()=>{$("#inst").style.display="none"});
+$("#inst").onclick=async()=>{
+  if(!deferredInstall) return;
+  deferredInstall.prompt();
+  try{await deferredInstall.userChoice}catch(e){}
+  deferredInstall=null; $("#inst").style.display="none";
+};
+if(!navigator.onLine) $("#offi").textContent="📴";
+if("serviceWorker" in navigator){
+  addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
+  navigator.serviceWorker.addEventListener("message",e=>{
+    if(e.data&&e.data.type==="done") $("#offi").textContent="📴✅";
   });
 }
-
-/* ============ القصاصات 🎉 ============ */
-const cv=$("#confetti"), cx=cv.getContext("2d");
-function confetti(){
-  cv.width=innerWidth; cv.height=innerHeight;
-  const cols=["#ff595e","#ffca3a","#8ac926","#1982c4","#6a4c93","#ff924c"];
-  const ps=Array.from({length:220},()=>({
-    x:Math.random()*cv.width, y:-20-Math.random()*cv.height*.5,
-    w:6+Math.random()*8, h:10+Math.random()*10,
-    c:cols[Math.floor(Math.random()*cols.length)],
-    vy:2+Math.random()*4, vx:-2+Math.random()*4,
-    r:Math.random()*6, vr:-.2+Math.random()*.4}));
-  const t0=performance.now();
-  (function f(t){
-    cx.clearRect(0,0,cv.width,cv.height);
-    ps.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.r+=p.vr;
-      cx.save();cx.translate(p.x,p.y);cx.rotate(p.r);cx.fillStyle=p.c;cx.fillRect(-p.w/2,-p.h/2,p.w,p.h);cx.restore()});
-    if(t-t0<3200) requestAnimationFrame(f); else cx.clearRect(0,0,cv.width,cv.height);
-  })(t0);
+async function warmCache(){
+  if(!("serviceWorker" in navigator)||!navigator.onLine) return;
+  try{
+    const reg=await navigator.serviceWorker.ready;
+    const urls=[...new Set([
+      ...WINS.map(w=>w.img),
+      ...PHRASES.map(p=>p.img),
+      ...Object.values(UI.icons||{}).map(v=>v&&v.url)
+    ].filter(u=>/^https?:\/\//i.test(u||"")))];
+    const h={apikey:SUPABASE_KEY,Authorization:"Bearer "+SUPABASE_KEY};
+    const rest=Object.values(Q).map(p=>({url:API(p),headers:h}));
+    if(reg.active) reg.active.postMessage({type:"precache",urls:urls,rest:rest});
+  }catch(e){}
 }
 
-loadData().then(()=>{applyUI();showCats()});
+loadData()
+  .then(()=>{applyUI();showWins();warmCache()})
+  .catch(()=>{view.innerHTML='<div class="empty">📴</div>'});
 </script>
 </body>
 </html>
