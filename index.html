@@ -41,11 +41,17 @@ main{max-width:980px;margin:0 auto;padding:10px 18px 60px}
 .flat .card{background:transparent;border-color:transparent}
 .flat .card:hover{box-shadow:none;background:var(--card)}
 .flat .pic img{border-radius:0}
+.wgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:14px}
+.wcard{aspect-ratio:16/9;min-height:0;padding:10px}
+.wcard .pic{width:100%;height:100%}
+.wcard .emo{font-size:72px}
+.flat .wcard{background:var(--card);border-color:var(--border)}
 .blend .pic img{mix-blend-mode:multiply}
 html[data-theme="black"] .blend .pic img{mix-blend-mode:normal}
 .big .pic{width:min(70vw,300px);height:min(70vw,300px)}
 .big .pic img{mix-blend-mode:normal!important;border-radius:12px}
 .big .emo{font-size:150px}
+.big.wide .pic{width:100%;height:min(55vw,300px)}
 .empty{text-align:center;padding:40px;font-size:50px;opacity:.5}
 /* modal */
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:20;padding:16px}
@@ -88,7 +94,7 @@ html[data-theme="black"] .blend .pic img{mix-blend-mode:normal}
 </header>
 
 <nav>
-  <button data-tab="win" class="active">🪟</button>
+  <button data-tab="win" class="active">🛎️</button>
   <button data-tab="voice">🎙️</button>
 </nav>
 
@@ -148,7 +154,7 @@ function applyUI(){
   el.textContent=css;
   document.querySelectorAll(".themes button").forEach(b=>{b.style.background=mergedTheme(b.dataset.t).bg});
   document.querySelector(".logo").innerHTML=ico("logo","🤟");
-  document.querySelector('nav [data-tab="win"]').innerHTML=ico("win","🪟");
+  document.querySelector('nav [data-tab="win"]').innerHTML=ico("win","🛎️");
   document.querySelector('nav [data-tab="voice"]').innerHTML=ico("voice","🎙️");
   const s={...DEF_STYLE,...(UI.style||{})};
   document.body.classList.toggle("flat",!!s.flat);
@@ -189,13 +195,13 @@ document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{
 /* ============ 1) النوافذ ============ */
 function showWins(){
   view.innerHTML = WINS.length
-    ? `<div class="grid">${WINS.map(w=>`<div class="card" data-w="${esc(w.id)}">${pic(w)}</div>`).join("")}</div>`
-    : `<div class="empty">🪟</div>`;
+    ? `<div class="wgrid">${WINS.map(w=>`<div class="card wcard" data-w="${esc(w.id)}">${pic(w)}</div>`).join("")}</div>`
+    : `<div class="empty">🛎️</div>`;
   view.querySelectorAll("[data-w]").forEach(el=>el.onclick=()=>openWin(WINS.find(w=>w.id===el.dataset.w)));
 }
 function openWin(w){
   $("#sheet").innerHTML = `<button class="close">✖</button>
-    <div class="big">${pic(w)}</div>
+    <div class="big wide">${pic(w)}</div>
     <h2>${esc(w.title)}</h2>${w.text?`<p class="txt">${esc(w.text)}</p>`:""}`;
   $("#modal").classList.add("show");
   $(".close").onclick=closeModal;
