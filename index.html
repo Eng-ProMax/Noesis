@@ -64,6 +64,7 @@ html[data-theme="black"] .blend .pic img{mix-blend-mode:normal}
 .mic{width:110px;height:110px;border-radius:50%;border:4px solid var(--accent);background:var(--card);font-size:48px;cursor:pointer;transition:.2s}
 .mic.rec{background:var(--bad);border-color:var(--bad);animation:pulse 1s infinite}
 @keyframes pulse{50%{transform:scale(1.08)}}
+.vhint{font-size:20px;font-weight:700;text-align:center;line-height:1.7;max-width:420px}
 .vstat{font-size:15px;text-align:center;opacity:.9;min-height:20px}
 .vmsg{font-size:15px;text-align:center;min-height:20px;font-weight:600}
 .offb{display:inline-block;padding:10px 16px;border-radius:12px;border:1px solid var(--border);background:var(--card);color:var(--text);cursor:pointer;font-size:15px}
@@ -273,21 +274,29 @@ function renderVStatus(){
     st.appendChild(b);
   }
 }
-function toggleMic(){
-  if(!SR||!voiceInfo) return;
+async function toggleMic(){
+  if(!SR){vmsg("❌ هذا المتصفح ما يدعم الصوت. استخدم Chrome أو Edge أو Safari.");return}
   if(voiceRec){voiceRec.stop();return}
+  if(!voiceInfo){voiceInfo=await probeVoice();renderVStatus()}
   if(voiceInfo.kind==="download"){vmsg("نزّل الصوت العربي أولاً ⬇️");return}
   if(voiceInfo.kind==="cloud"&&!navigator.onLine){vmsg("📴 بدون نت الصوت ما يشتغل هنا، استخدم الصور.");return}
+  vmsg("");
+  startRec(0);
+}
+function startRec(i){
+  const langs = voiceInfo.kind==="local" ? [voiceInfo.lang] : [voiceInfo.lang,...LANGS.filter(l=>l!==voiceInfo.lang)];
   const rec=new SR();
-  rec.lang=voiceInfo.lang; rec.continuous=false; rec.interimResults=false; rec.maxAlternatives=3;
+  rec.lang=langs[i]; rec.continuous=false; rec.interimResults=false; rec.maxAlternatives=3;
   if(voiceInfo.kind==="local") rec.processLocally=true;
   rec.onresult=ev=>{
     const alts=[];
-    for(let i=0;i<ev.results.length;i++) for(let j=0;j<ev.results[i].length;j++) alts.push(ev.results[i][j].transcript);
+    for(let a=0;a<ev.results.length;a++) for(let j=0;j<ev.results[a].length;j++) alts.push(ev.results[a][j].transcript);
     showResult(matchPhrases(alts.join(" ")),alts[0]||"");
     vmsg("");
   };
   rec.onerror=ev=>{
+    if(ev.error==="aborted") return;
+    if(ev.error==="language-not-supported"&&i+1<langs.length){voiceRec=null;startRec(i+1);return}
     const m={
       "not-allowed":"🎙️ اسمح للمتصفح باستخدام المايك",
       "service-not-allowed":"🎙️ اسمح للمتصفح باستخدام المايك",
@@ -297,16 +306,20 @@ function toggleMic(){
     };
     vmsg(m[ev.error]||("❌ "+ev.error));
   };
-  rec.onend=()=>{voiceRec=null;const mic=$("#mic");if(mic)mic.classList.remove("rec")};
+  rec.onend=()=>{if(voiceRec===rec){voiceRec=null;const mic=$("#mic");if(mic)mic.classList.remove("rec")}};
   try{
-    vmsg("");
     voiceRec=rec; rec.start();
-    $("#mic").classList.add("rec");
-  }catch(e){voiceRec=null;$("#mic").classList.remove("rec");vmsg("❌ تعذّر تشغيل المايك")}
+    const mic=$("#mic"); if(mic) mic.classList.add("rec");
+  }catch(e){
+    voiceRec=null;
+    const mic=$("#mic"); if(mic) mic.classList.remove("rec");
+    vmsg("❌ تعذّر تشغيل المايك");
+  }
 }
 function showVoice(){
   view.innerHTML = `<div class="micwrap">
       <button class="mic" id="mic">🎙️</button>
+      <div class="vhint">احجي بالمايك والصوت راح يحوله لصور افتهمهن</div>
       <div class="vstat" id="vst"></div>
       <div class="vmsg" id="vmsg"></div>
     </div>
