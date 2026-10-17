@@ -30,7 +30,7 @@ h1{font-size:18px;padding:14px 16px;border-bottom:1px solid var(--border);text-a
 <div id="ctl"></div>
 
 <script>
-const URL_ = "https://mxlaeygympuvsppvjivl.supabase.co";
+const URL_ = "https://mxlaeygympuvsppvjivl.supabase.co/rest/v1/";
 const KEY  = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im14bGFleWd5bXB1dnNwcHZqaXZsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE2NTA3NDMsImV4cCI6MjEwNzIyNjc0M30.mfy_J-lPmfl5CBfZ3JSmabxtnkKexunU4GRHxj1W-p0";
 
 let token=null, S={}, UI={};
@@ -44,15 +44,14 @@ const DEF_THEMES={
 };
 const THEME_NAMES={white:"⚪ أبيض",beige:"🟤 بيج",black:"⚫ أسود",pink:"🌸 وردي"};
 const COLOR_NAMES={bg:"الخلفية",card:"البطاقات",text:"النص",accent:"اللون الأساسي",border:"الحدود"};
-const ICON_DEF={logo:["🤟","الشعار"],win:["🪟","تبويب النوافذ"],voice:["🎙️","تبويب الصوت"]};
+const ICON_DEF={logo:["🤟","الشعار"],win:["🛎️","تبويب النوافذ"],voice:["🎙️","تبويب الصوت"]};
 const DEF_STYLE={flat:true,blend:true,size:100};
 const curStyle=()=>({...DEF_STYLE,...(UI.style||{})});
 
 /* أنواع المحتوى: النوافذ والعبارات الصوتية */
 const KINDS={
-  win:{table:"windows",folder:"windows",name:"نافذة",plural:"النوافذ",icon:"🪟",
-    fields:[["title","الاسم","اكتب اسم النافذة (مثال: نافذة 3)"],["text","النص","اكتب النص اللي يظهر للأصم عند الضغط على النافذة"]],
-    multi:{text:true}},
+  win:{table:"windows",folder:"windows",name:"نافذة",plural:"النوافذ",icon:"🛎️",
+    fields:[["title","الاسم","اكتب الاسم اللي يظهر للأصم (مثال: نافذة 3 - الاستنساخ)"]]},
   phr:{table:"phrases",folder:"phrases",name:"عبارة",plural:"العبارات الصوتية",icon:"🎙️",
     fields:[["title","الاسم","اكتب اسم العبارة (مثال: الحمام)"],["keywords","كلمات التعرف","اكتب الكلمات اللي ينطقها الموظف وافصل بينها بفاصلة (مثال: حمام, تواليت, حمامات)"]]}
 };
@@ -192,7 +191,7 @@ function stepLogin(){
 function stepMenu(){
   bot("شنو تريد تسوي؟");
   buttons([
-    ["🪟 النوافذ",()=>kindMenu("win")],
+    ["🛎️ النوافذ",()=>kindMenu("win")],
     ["🎙️ العبارات الصوتية",()=>kindMenu("phr")],
     ["🎨 تصميم الموقع",stepDesign]
   ]);
