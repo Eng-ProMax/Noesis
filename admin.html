@@ -26,6 +26,7 @@ h1{font-size:18px;padding:14px 16px;border-bottom:1px solid var(--border);text-a
 </head>
 <body>
 <h1>🤟 لوحة التحكم</h1>
+<img src="image.jpg" alt = "صورة التبويب" style="max-width: 100%; height: auto;">
 <div id="log"></div>
 <div id="ctl"></div>
 
@@ -44,13 +45,13 @@ const DEF_THEMES={
 };
 const THEME_NAMES={white:"⚪ أبيض",beige:"🟤 بيج",black:"⚫ أسود",pink:"🌸 وردي"};
 const COLOR_NAMES={bg:"الخلفية",card:"البطاقات",text:"النص",accent:"اللون الأساسي",border:"الحدود"};
-const ICON_DEF={logo:["🤟","الشعار"],win:[image.jpg,"تبويب النوافذ"],voice:["🎙️","تبويب الصوت"]};
+const ICON_DEF={logo:["🤟","الشعار"],win:["image.jpg","تبويب النوافذ"],voice:["🎙️","تبويب الصوت"]};
 const DEF_STYLE={flat:true,blend:true,size:100};
 const curStyle=()=>({...DEF_STYLE,...(UI.style||{})});
 
 /* أنواع المحتوى: النوافذ والعبارات الصوتية */
 const KINDS={
-  win:{table:"windows",folder:"windows",name:"نافذة",plural:"النوافذ",icon:"🛎️",
+  win:{table:"windows",folder:"windows",name:"نافذة",plural:"النوافذ",icon:"image.jpg",
     fields:[["title","الاسم","اكتب الاسم اللي يظهر للأصم (مثال: نافذة 3 - الاستنساخ)"]]},
   phr:{table:"phrases",folder:"phrases",name:"عبارة",plural:"العبارات الصوتية",icon:"🎙️",
     fields:[["title","الاسم","اكتب اسم العبارة (مثال: الحمام)"],["keywords","كلمات التعرف","اكتب الكلمات اللي ينطقها الموظف وافصل بينها بفاصلة (مثال: حمام, تواليت, حمامات)"]]}
