@@ -218,7 +218,7 @@ document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{
 function showWins(){
   view.innerHTML = WINS.length
     ? `<div class="wgrid">${WINS.map(w=>`<div class="card wcard" data-w="${esc(w.id)}">${pic(w)}</div>`).join("")}</div>`
-    : `<div class="empty">🛎️</div>`;
+    : `<div class="empty">image.jpg</div>`;
   view.querySelectorAll("[data-w]").forEach(el=>el.onclick=()=>openWin(WINS.find(w=>w.id===el.dataset.w)));
 }
 function openWin(w){
