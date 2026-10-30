@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl" data-theme="pink">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>مساعد الصم والبكم</title>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
@@ -26,10 +26,15 @@ header{display:flex;justify-content:space-between;align-items:center;padding:14p
 .themes button{width:30px;height:30px;border-radius:50%;border:2px solid var(--border);cursor:pointer}
 .themes button.active{border-color:var(--accent);transform:scale(1.15)}
 .t-white{background:#fff}.t-beige{background:#e8d7b5}.t-black{background:#111}.t-pink{background:#fff0f5}
-nav{display:flex;gap:10px;padding:14px 18px;justify-content:center}
-nav button{flex:1;max-width:260px;padding:12px;font-size:30px;border-radius:16px;border:1px solid var(--border);background:var(--card);color:var(--text);cursor:pointer;transition:.2s}
-nav button.active{background:var(--accent);color:#fff;border-color:var(--accent)}
-main{max-width:980px;margin:0 auto;padding:10px 18px 60px}
+nav{position:fixed;left:0;right:0;bottom:0;z-index:15;display:flex;gap:8px;padding:8px 12px calc(8px + env(safe-area-inset-bottom));background:var(--card);border-top:1px solid var(--border);box-shadow:0 -6px 20px rgba(0,0,0,.08)}
+nav button{position:relative;flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 6px;border:none;border-radius:16px;background:transparent;color:var(--text);opacity:.6;cursor:pointer;font-family:inherit;transition:.2s}
+nav button .ni{font-size:28px;line-height:1.15}
+nav button .nl{font-size:14px;font-weight:700}
+nav button.active{opacity:1;color:var(--accent);background:color-mix(in srgb,var(--accent) 14%,transparent)}
+nav button.active::before{content:"";position:absolute;top:-9px;left:28%;right:28%;height:4px;border-radius:0 0 4px 4px;background:var(--accent)}
+main{max-width:980px;margin:0 auto;padding:10px 18px calc(112px + env(safe-area-inset-bottom))}
+@keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.fadein{animation:fi .22s ease-out}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:14px}
 .card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:16px 10px;text-align:center;cursor:pointer;transition:.2s;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-height:140px}
 .card:hover{transform:translateY(-4px);border-color:var(--accent);box-shadow:0 8px 20px rgba(0,0,0,.12)}
@@ -74,7 +79,22 @@ html[data-theme="black"] .blend .pic img{mix-blend-mode:normal}
 .vcard .pic{width:min(55vw,220px);height:min(55vw,220px)}
 .vcard .emo{font-size:130px}
 .vl{font-size:28px;font-weight:700}
-.sep{border:none;border-top:1px solid var(--border);margin:8px 0 18px}
+.dlab{font-size:44px;line-height:1}
+.cal{width:min(60vw,230px);border:3px solid var(--accent);border-radius:20px;overflow:hidden;background:var(--bg);text-align:center}
+.calm{background:var(--accent);color:#fff;font-size:24px;font-weight:700;padding:8px}
+.cald{font-size:84px;font-weight:800;line-height:1.1;padding-top:6px}
+.calw{font-size:26px;font-weight:700}
+.caly{font-size:18px;opacity:.7;padding-bottom:10px}
+.sep{border:none;border-top:1px solid var(--border);margin:24px 0 20px}
+.cta{gap:4px;padding:12px}
+.cico{font-size:44px;line-height:1}
+.ctt{font-size:38px;font-weight:800;line-height:1.2}
+.cts{font-size:17px;font-weight:600;opacity:.85;line-height:1.5}
+.mb{margin-top:34px}
+.txtwrap{display:flex;flex-direction:column;align-items:stretch;margin-bottom:14px}
+.tin{width:100%;min-height:96px;padding:14px;border-radius:16px;border:2px solid var(--border);background:var(--card);color:var(--text);font:600 20px "Segoe UI",Tahoma,sans-serif;outline:none;resize:vertical}
+.tin:focus{border-color:var(--accent)}
+.go{margin-top:12px;padding:14px 28px;border:none;border-radius:16px;background:var(--accent);color:#fff;font:700 20px "Segoe UI",Tahoma,sans-serif;cursor:pointer}
 </style>
 </head>
 <body>
@@ -94,8 +114,8 @@ html[data-theme="black"] .blend .pic img{mix-blend-mode:normal}
 </header>
 
 <nav>
-  <button data-tab="win" class="active">🛎️</button>
-  <button data-tab="voice">🎙️</button>
+  <button data-tab="win" class="active"><span class="ni">🛎️</span><span class="nl">النوافذ</span></button>
+  <button data-tab="voice"><span class="ni">🎙️</span><span class="nl">التواصل</span></button>
 </nav>
 
 <main id="view"></main>
@@ -154,8 +174,8 @@ function applyUI(){
   el.textContent=css;
   document.querySelectorAll(".themes button").forEach(b=>{b.style.background=mergedTheme(b.dataset.t).bg});
   document.querySelector(".logo").innerHTML=ico("logo","🤟");
-  document.querySelector('nav [data-tab="win"]').innerHTML=ico("win","🛎️");
-  document.querySelector('nav [data-tab="voice"]').innerHTML=ico("voice","🎙️");
+  document.querySelector('nav [data-tab="win"] .ni').innerHTML=ico("win","🛎️");
+  document.querySelector('nav [data-tab="voice"] .ni').innerHTML=ico("voice","🎙️");
   const s={...DEF_STYLE,...(UI.style||{})};
   document.body.classList.toggle("flat",!!s.flat);
   document.body.classList.toggle("blend",!!s.blend);
@@ -190,6 +210,8 @@ document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{
   document.querySelectorAll("nav button").forEach(x=>x.classList.toggle("active",x===b));
   if(voiceRec){try{voiceRec.abort()}catch(e){}}
   ({win:showWins,voice:showVoice})[b.dataset.tab]();
+  window.scrollTo(0,0);
+  view.classList.remove("fadein"); void view.offsetWidth; view.classList.add("fadein");
 });
 
 /* ============ 1) النوافذ ============ */
@@ -206,7 +228,10 @@ function openWin(w){
   $("#modal").classList.add("show");
   $(".close").onclick=closeModal;
 }
-function closeModal(){$("#modal").classList.remove("show")}
+function closeModal(){
+  if(voiceRec){try{voiceRec.abort()}catch(e){}}
+  $("#modal").classList.remove("show");
+}
 $("#modal").onclick=e=>{if(e.target.id==="modal")closeModal()};
 
 /* ============ 2) الصوت ============ */
@@ -216,20 +241,110 @@ let voiceInfo = null, voiceRec = null;
 
 async function probeVoice(){
   if(!SR) return {kind:"none"};
-  if(typeof SR.available==="function"){
+  let bad=false; try{bad=localStorage.getItem("probeBad")==="1"}catch(e){}
+  if(!bad && typeof SR.available==="function"){
+    try{localStorage.setItem("probeBad","1")}catch(e){}
     let dl=null;
-    for(const l of LANGS){
-      try{
-        const s=await SR.available({langs:[l],processLocally:true});
-        if(s==="available") return {kind:"local",lang:l};
-        if(!dl&&(s==="downloadable"||s==="downloading")) dl=l;
-      }catch(e){}
+    try{
+      for(const l of LANGS){
+        try{
+          const s=await Promise.race([
+            SR.available({langs:[l],processLocally:true}),
+            new Promise((_,rej)=>setTimeout(()=>rej(new Error("t")),2500))
+          ]);
+          if(s==="available") return {kind:"local",lang:l};
+          if(!dl&&(s==="downloadable"||s==="downloading")) dl=l;
+        }catch(e){}
+      }
+    }finally{
+      try{localStorage.removeItem("probeBad")}catch(e){}
     }
     if(dl) return {kind:"download",lang:dl};
   }
   return {kind:"cloud",lang:"ar-IQ"};
 }
-function matchPhrases(text){
+/* ===== المواعيد: تواريخ من الكلام ===== */
+const MONTHS=["كانون الثاني","شباط","آذار","نيسان","أيار","حزيران","تموز","آب","أيلول","تشرين الأول","تشرين الثاني","كانون الأول"];
+const WDAYS=["الأحد","الاثنين","الثلاثاء","الأربعاء","الخميس","الجمعة","السبت"];
+const WD_KEYS=["الاحد","الاثنين","الثلاثاء","الاربعاء","الخميس","الجمعه","السبت"];
+const NUMW={"واحد":1,"اثنين":2,"اثنان":2,"ثلاث":3,"ثلاثه":3,"ثلث":3,"اربع":4,"اربعه":4,"خمس":5,"خمسه":5,"ست":6,"سته":6,"سبع":7,"سبعه":7,"ثمان":8,"ثمانيه":8,"تسع":9,"تسعه":9,"عشر":10,"عشره":10};
+const UNITS={"يوم":["d",1],"يومين":["d",2],"ايام":["d",0],"اسبوع":["w",1],"اسبوعين":["w",2],"اسابيع":["w",0],"شهر":["m",1],"شهرين":["m",2],"شهور":["m",0],"اشهر":["m",0]};
+const LIMIT={d:90,w:26,m:24};
+const UEMO={d:"☀️",w:"🗓️",m:"🌙"};
+const KEYCAP=n=>String(n).split("").map(c=>c+"\uFE0F\u20E3").join("");
+const midnight=()=>{const t=new Date();t.setHours(0,0,0,0);return t};
+function addMonths(d,n){
+  const r=new Date(d.getFullYear(),d.getMonth()+n,1);
+  const last=new Date(r.getFullYear(),r.getMonth()+1,0).getDate();
+  r.setDate(Math.min(d.getDate(),last));
+  return r;
+}
+function dateItem(k,n,label,dlab){
+  const t=midnight(); let d;
+  if(k==="m") d=addMonths(t,n);
+  else {d=new Date(t); d.setDate(d.getDate()+(k==="w"?7*n:n));}
+  return {date:true,d:d,label:label,dlab:dlab};
+}
+function weekdayItem(i){
+  const t=midnight(), diff=((i-t.getDay()+7)%7)||7;
+  const d=new Date(t); d.setDate(d.getDate()+diff);
+  return {date:true,d:d,label:"يوم "+WDAYS[i],dlab:"🗓️"};
+}
+function unitLabel(k,n){
+  const one={d:"يوم",w:"أسبوع",m:"شهر"}, two={d:"يومين",w:"أسبوعين",m:"شهرين"}, many={d:"أيام",w:"أسابيع",m:"أشهر"};
+  if(n===1) return "بعد "+one[k];
+  if(n===2) return "بعد "+two[k];
+  return "بعد "+n+" "+(n<=10?many[k]:one[k]);
+}
+function toNum(w){
+  if(!w) return null;
+  const x=w.replace(/[٠-٩]/g,c=>String(c.charCodeAt(0)-1632));
+  if(/^\d{1,3}$/.test(x)) return parseInt(x,10);
+  return NUMW[x]!==undefined?NUMW[x]:null;
+}
+function parseDates(text){
+  const norm=nrm(text), toks=[...norm.matchAll(/\S+/g)].map(m=>({w:m[0],i:m.index}));
+  const T1=["باجر","بكره","غدا","غد"], out=[];
+  for(let i=0;i<toks.length;i++){
+    const w=toks[i].w, pos=toks[i].i;
+    if(w==="بعد"){
+      const a=toks[i+1]&&toks[i+1].w, b=toks[i+2]&&toks[i+2].w;
+      if(a&&T1.includes(a)){out.push({pos:pos,it:dateItem("d",2,"بعد باجر","2️⃣☀️")});i+=1;continue}
+      if(a&&UNITS[a]){
+        const k=UNITS[a][0], n0=UNITS[a][1];
+        if(n0>0&&n0<=LIMIT[k]){out.push({pos:pos,it:dateItem(k,n0,unitLabel(k,n0),KEYCAP(n0)+UEMO[k])});i+=1;continue}
+      }
+      const n=toNum(a);
+      if(n!==null&&b&&UNITS[b]){
+        const k=UNITS[b][0];
+        if(n>0&&n<=LIMIT[k]){out.push({pos:pos,it:dateItem(k,n,unitLabel(k,n),KEYCAP(n)+UEMO[k])});i+=2;continue}
+      }
+      continue;
+    }
+    if(T1.includes(w)){out.push({pos:pos,it:dateItem("d",1,"باجر","1️⃣☀️")});continue}
+    if(w==="اليوم"){out.push({pos:pos,it:dateItem("d",0,"اليوم","📍")});continue}
+    const wd=WD_KEYS.indexOf(w);
+    if(wd>=0){out.push({pos:pos,it:weekdayItem(wd)});continue}
+  }
+  return out;
+}
+const QUICK=[
+  {l:"باجر",f:()=>dateItem("d",1,"باجر","1️⃣☀️")},
+  {l:"بعد باجر",f:()=>dateItem("d",2,"بعد باجر","2️⃣☀️")},
+  {l:"بعد 3 أيام",f:()=>dateItem("d",3,unitLabel("d",3),KEYCAP(3)+UEMO.d)},
+  {l:"بعد أسبوع",f:()=>dateItem("w",1,unitLabel("w",1),KEYCAP(1)+UEMO.w)},
+  {l:"بعد أسبوعين",f:()=>dateItem("w",2,unitLabel("w",2),KEYCAP(2)+UEMO.w)},
+  {l:"بعد شهر",f:()=>dateItem("m",1,unitLabel("m",1),KEYCAP(1)+UEMO.m)}
+];
+function dateCard(it){
+  const d=it.d;
+  return `<div class="vcard"><div class="dlab">${it.dlab}</div>
+    <div class="cal"><div class="calm">${MONTHS[d.getMonth()]}</div><div class="cald">${d.getDate()}</div><div class="calw">${WDAYS[d.getDay()]}</div><div class="caly">${d.getFullYear()}</div></div>
+    <div class="vl">${esc(it.label)}</div></div>`;
+}
+/* ===== نهاية المواعيد ===== */
+
+function phraseHits(text){
   const t=" "+nrm(text)+" ", hits=[];
   PHRASES.forEach(p=>{
     const kws=[p.title,...String(p.keywords||"").split(/[,،\n]/)].map(k=>nrm(k).replace(/^ال/,"")).filter(Boolean);
@@ -240,13 +355,23 @@ function matchPhrases(text){
     });
     if(best>=0) hits.push([best,p]);
   });
-  return hits.sort((a,b)=>a[0]-b[0]).map(h=>h[1]);
+  return hits;
+}
+function analyze(first,all){
+  const out=[], seen={};
+  phraseHits(all).forEach(h=>out.push([h[0],h[1]]));
+  parseDates(first).forEach(d=>{
+    if(seen[d.it.label]) return;
+    seen[d.it.label]=1;
+    out.push([d.pos+1,d.it]);
+  });
+  return out.sort((a,b)=>a[0]-b[0]).map(x=>x[1]);
 }
 function showResult(list,heard){
   const el=$("#vres"); if(!el) return;
   const h = heard ? `<div class="heard">«${esc(heard)}»</div>` : "";
   el.innerHTML = list.length
-    ? h+`<div class="vcards">${list.map(p=>`<div class="vcard">${pic(p)}<div class="vl">${esc(p.title)}</div></div>`).join("")}</div>`
+    ? h+`<div class="vcards">${list.map(p=>p.date?dateCard(p):`<div class="vcard">${pic(p)}<div class="vl">${esc(p.title)}</div></div>`).join("")}</div>`
     : h+`<div class="empty">🤷</div>`;
 }
 function vmsg(t){const m=$("#vmsg"); if(m) m.textContent=t||""}
@@ -291,7 +416,7 @@ function startRec(i){
   rec.onresult=ev=>{
     const alts=[];
     for(let a=0;a<ev.results.length;a++) for(let j=0;j<ev.results[a].length;j++) alts.push(ev.results[a][j].transcript);
-    showResult(matchPhrases(alts.join(" ")),alts[0]||"");
+    showResult(analyze(alts[0]||"",alts.join(" ")),alts[0]||"");
     vmsg("");
   };
   rec.onerror=ev=>{
@@ -316,23 +441,57 @@ function startRec(i){
     vmsg("❌ تعذّر تشغيل المايك");
   }
 }
-function showVoice(){
-  view.innerHTML = `<div class="micwrap">
+function openSheet(html){
+  $("#sheet").innerHTML = `<button class="close">✖</button>`+html;
+  $("#modal").classList.add("show");
+  $(".close").onclick=closeModal;
+}
+function openVoiceModal(){
+  openSheet(`<div class="micwrap mb">
       <button class="mic" id="mic">🎙️</button>
       <div class="vhint">احجي بالمايك والصوت راح يحوله لصور افتهمهن</div>
       <div class="vstat" id="vst"></div>
       <div class="vmsg" id="vmsg"></div>
     </div>
-    <div id="vres"></div>
-    <hr class="sep">
-    <div class="grid">${PHRASES.map(p=>`<div class="card" data-p="${esc(p.id)}">${pic(p)}<div class="label">${esc(p.title)}</div></div>`).join("")}</div>`;
+    <div id="vres"></div>`);
   $("#mic").onclick=toggleMic;
-  view.querySelectorAll("[data-p]").forEach(el=>el.onclick=()=>{
-    showResult([PHRASES.find(p=>p.id===el.dataset.p)],"");
-    const r=$("#vres"); if(r) r.scrollIntoView({behavior:"smooth",block:"start"});
-  });
   renderVStatus();
   if(!voiceInfo) probeVoice().then(v=>{voiceInfo=v;renderVStatus()});
+}
+function openTextModal(){
+  openSheet(`<div class="txtwrap mb">
+      <textarea class="tin" id="tin" rows="3" placeholder="اكتب هنا..."></textarea>
+      <button class="go" id="tgo">حوّل لصور</button>
+    </div>
+    <div id="vres"></div>`);
+  const go=()=>{
+    const v=$("#tin").value.trim();
+    if(!v){$("#tin").focus();return}
+    showResult(analyze(v,v),v);
+    const r=$("#vres"); if(r) r.scrollIntoView({behavior:"smooth",block:"nearest"});
+  };
+  $("#tgo").onclick=go;
+  $("#tin").onkeydown=e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();go()}};
+  $("#tin").focus();
+}
+function openResultModal(list){
+  openSheet(`<div class="mb"><div id="vres"></div></div>`);
+  showResult(list,"");
+}
+function showVoice(){
+  view.innerHTML = `<div class="wgrid">
+      <div class="card wcard cta" id="cv"><span class="cico">🎙️</span><div class="ctt">اضغط هنا</div><div class="cts">اذا تريد تتواصل وياية بتسجيل صوتك</div></div>
+      <div class="card wcard cta" id="ct"><span class="cico">⌨️</span><div class="ctt">اضغط هنا</div><div class="cts">اذا تريد تتواصل وياية بالكتابة</div></div>
+    </div>
+    <hr class="sep">
+    <div class="grid">${PHRASES.map(p=>`<div class="card" data-p="${esc(p.id)}">${pic(p)}<div class="label">${esc(p.title)}</div></div>`).join("")}</div>
+    <hr class="sep">
+    <div class="grid">${QUICK.map((q,i)=>`<div class="card" data-q="${i}"><span class="emo">📅</span><div class="label">${q.l}</div></div>`).join("")}</div>`;
+  $("#cv").onclick=openVoiceModal;
+  $("#ct").onclick=openTextModal;
+  view.querySelectorAll("[data-q]").forEach(el=>el.onclick=()=>openResultModal([QUICK[Number(el.dataset.q)].f()]));
+  view.querySelectorAll("[data-p]").forEach(el=>el.onclick=()=>openResultModal([PHRASES.find(p=>p.id===el.dataset.p)]));
+  if(!voiceInfo) probeVoice().then(v=>{voiceInfo=v});
 }
 
 /* ============ تثبيت التطبيق + العمل بدون نت ============ */
@@ -372,4 +531,4 @@ loadData()
   .catch(()=>{view.innerHTML='<div class="empty">📴</div>'});
 </script>
 </body>
-</html>
+  </html>
